@@ -12,6 +12,8 @@ from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import TemplateView
+from django.contrib.auth import authenticate, login, logout
+from django.shortcuts import redirect
 
 from .models import Customer, Order, Vehicle, ServiceDetails, TireSalesDetails, ConsultationDetails, JobCard, Invoice
 
@@ -78,7 +80,19 @@ def _json(request: HttpRequest) -> Dict[str, Any]:
 
 # ---------- Template Views ----------
 
-class DashboardView(TemplateView):
+class BaseTemplateView(TemplateView):
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        user = getattr(self.request, 'user', None)
+        is_admin = bool(user and (user.is_superuser or user.is_staff))
+        ctx.update({
+            'user_is_admin': is_admin,
+            'user_authenticated': bool(user and user.is_authenticated),
+            'current_username': (user.username if user and user.is_authenticated else ''),
+        })
+        return ctx
+
+class DashboardView(BaseTemplateView):
     template_name = 'index.html'
 
     def get_context_data(self, **kwargs):
@@ -96,89 +110,128 @@ class DashboardView(TemplateView):
         return ctx
 
 
-class CustomerRegistrationView(TemplateView):
+class CustomerRegistrationView(BaseTemplateView):
     template_name = 'customer-registration.html'
 
 
-class CustomerListView(TemplateView):
+class CustomerListView(BaseTemplateView):
     template_name = 'customer-list.html'
 
 
-class CustomerSearchView(TemplateView):
+class CustomerSearchView(BaseTemplateView):
     template_name = 'customer-search.html'
 
 
-class CustomerManagerView(TemplateView):
+class CustomerManagerView(BaseTemplateView):
     template_name = 'customer-manager.html'
 
 
-class OrderCreateView(TemplateView):
+class OrderCreateView(BaseTemplateView):
     template_name = 'order-create.html'
 
 
-class OrderListView(TemplateView):
+class OrderListView(BaseTemplateView):
     template_name = 'order-list.html'
 
 
-class OrderTrackingView(TemplateView):
+class OrderTrackingView(BaseTemplateView):
     template_name = 'order-tracking.html'
 
 
-class AnalyticsOverviewView(TemplateView):
+class AnalyticsOverviewView(BaseTemplateView):
     template_name = 'analytics-overview.html'
 
 
-class AnalyticsPerformanceView(TemplateView):
+class AnalyticsPerformanceView(BaseTemplateView):
     template_name = 'analytics-performance.html'
 
 
-class AnalyticsCustomerView(TemplateView):
+class AnalyticsCustomerView(BaseTemplateView):
     template_name = 'analytics-customer.html'
 
 
-class AnalyticsServiceView(TemplateView):
+class AnalyticsServiceView(BaseTemplateView):
     template_name = 'analytics-service.html'
 
 
-class AnalyticsRevenueView(TemplateView):
+class AnalyticsRevenueView(BaseTemplateView):
     template_name = 'analytics-revenue.html'
 
 
-class ReportsDailyView(TemplateView):
+class ReportsDailyView(BaseTemplateView):
     template_name = 'reports-daily.html'
 
 
-class ReportsCustomerView(TemplateView):
+class ReportsCustomerView(BaseTemplateView):
     template_name = 'reports-customer.html'
 
 
-class ReportsServiceView(TemplateView):
+class ReportsServiceView(BaseTemplateView):
     template_name = 'reports-service.html'
 
 
-class ReportsFinancialView(TemplateView):
+class ReportsFinancialView(BaseTemplateView):
     template_name = 'reports-financial.html'
 
 
-class ReportsCustomView(TemplateView):
+class ReportsCustomView(BaseTemplateView):
     template_name = 'reports-custom.html'
 
 
-class SettingsGeneralView(TemplateView):
+class SettingsGeneralView(BaseTemplateView):
     template_name = 'settings-general.html'
 
 
-class SettingsServicesView(TemplateView):
+class SettingsServicesView(BaseTemplateView):
     template_name = 'settings-services.html'
 
 
-class SettingsUsersView(TemplateView):
+class SettingsUsersView(BaseTemplateView):
     template_name = 'settings-users.html'
 
 
-class SettingsBackupView(TemplateView):
+class SettingsBackupView(BaseTemplateView):
     template_name = 'settings-backup.html'
 
+# ---------- Auth Views ----------
+class LoginView(TemplateView):
+    template_name = 'login.html'
+
+    def post(self, request: HttpRequest, *args, **kwargs):
+        data = request.POST
+        username = (data.get('username') or '').strip()
+        password = (data.get('password') or '').strip()
+        user_type = (data.get('user_type') or '').strip().lower()
+        user = authenticate(request, username=username, password=password)
+        if user is None:
+            return self.render_to_response({'error': 'Invalid credentials'})
+        login(request, user)
+        is_admin = bool(user.is_superuser or user.is_staff or user_type == 'administrator')
+        return redirect('admin_dashboard' if is_admin else 'dashboard')
+
+class LogoutView(TemplateView):
+    def get(self, request: HttpRequest, *args, **kwargs):
+        logout(request)
+        return redirect('login')
+
+# ---------- Admin Views ----------
+class AdminRequiredMixin:
+    def dispatch(self, request: HttpRequest, *args, **kwargs):
+        user = getattr(request, 'user', None)
+        if not user or not user.is_authenticated:
+            return redirect('login')
+        if not (user.is_staff or user.is_superuser):
+            return redirect('dashboard')
+        return super().dispatch(request, *args, **kwargs)
+
+class AdminDashboardView(AdminRequiredMixin, BaseTemplateView):
+    template_name = 'admin-dashboard.html'
+
+class UserManagementView(AdminRequiredMixin, BaseTemplateView):
+    template_name = 'admin-users.html'
+
+class InventoryManagementView(AdminRequiredMixin, BaseTemplateView):
+    template_name = 'admin-inventory.html'
 
 # ---------- API Views (JSON) ----------
 
