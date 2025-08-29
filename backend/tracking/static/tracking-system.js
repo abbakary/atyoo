@@ -77,61 +77,13 @@ var TrackingSystem = (function() {
     // Initialize the application
     function init() {
         utils.log('Tracking System initialized');
-        
-        // Initialize data if first time
-        if (localStorage.getItem('trackingSystem_customers') === null) {
-            localStorage.setItem('trackingSystem_customers', JSON.stringify([
-                {
-                    id: 'CUST-001',
-                    name: 'John Doe',
-                    phone: '+256701234567',
-                    email: 'john@example.com',
-                    type: 'personal',
-                    created: new Date().toISOString()
-                },
-                {
-                    id: 'CUST-002', 
-                    name: 'Jane Smith',
-                    phone: '+256709876543',
-                    email: 'jane@example.com',
-                    type: 'company',
-                    created: new Date().toISOString()
-                }
-            ]));
-        }
-        
-        if (localStorage.getItem('trackingSystem_orders') === null) {
-            localStorage.setItem('trackingSystem_orders', JSON.stringify([
-                {
-                    id: 'ORD-001',
-                    customerId: 'CUST-001',
-                    customerName: 'John Doe',
-                    service: 'Tire Sales',
-                    status: 'in-progress',
-                    arrivalTime: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
-                    estimatedDuration: 120,
-                    created: new Date().toISOString()
-                },
-                {
-                    id: 'ORD-002',
-                    customerId: 'CUST-002',
-                    customerName: 'Jane Smith',
-                    service: 'Car Service',
-                    status: 'completed',
-                    arrivalTime: new Date(Date.now() - 4 * 60 * 60 * 1000).toISOString(),
-                    departureTime: new Date(Date.now() - 1 * 60 * 60 * 1000).toISOString(),
-                    estimatedDuration: 180,
-                    actualDuration: 175,
-                    created: new Date().toISOString()
-                }
-            ]));
-        }
+        // No mock/localStorage seeding. Data comes from backend APIs only.
     }
 
     // API endpoints
     const api = {
         createCustomer: function(customerData) {
-            return fetch('/api/customers/create/', {
+            return fetch('/api/customers/', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -156,7 +108,7 @@ var TrackingSystem = (function() {
         },
         
         createOrder: function(orderData) {
-            return fetch('/api/orders/create/', {
+            return fetch('/api/orders/', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -203,7 +155,7 @@ var TrackingSystem = (function() {
             .then(result => {
                 if (result.success) {
                     // Also store in localStorage for immediate frontend use
-                    customers.save(result.customer);
+                    // Do not store to localStorage; rely on backend as source of truth
                     utils.log('Customer created successfully: ' + result.customer.id);
                 }
                 return result;
@@ -232,6 +184,43 @@ var TrackingSystem = (function() {
             });
     }
 
+    function getCustomerById(id){
+        return fetch(`/api/customers/${encodeURIComponent(id)}/`)
+            .then(r=>r.json())
+            .then(res=>res.success ? res.customer : null)
+            .catch(()=>null);
+    }
+
+    async function getAnalytics(){
+        try{
+            const [summaryRes, ordersRes] = await Promise.all([
+                fetch('/api/analytics/summary/').then(r=>r.json()),
+                fetch('/api/orders/list/').then(r=>r.json())
+            ]);
+            const now = new Date();
+            const last7 = [...Array(7)].map((_,i)=>{const d=new Date(now); d.setDate(now.getDate()- (6-i)); return d;});
+            const orders = (ordersRes.success? ordersRes.results: []) || [];
+            const dailyStats = last7.map(d=>{
+                const dateStr = d.toDateString();
+                const count = orders.filter(o=> new Date(o.arrivalTime||o.createdAt).toDateString()===dateStr).length;
+                return { date: d.toISOString(), orders: count };
+            });
+            const serviceTypeStats = {};
+            const breakdown = (summaryRes.success && summaryRes.data && summaryRes.data.serviceBreakdown) ? summaryRes.data.serviceBreakdown : [];
+            breakdown.forEach(b=>{ serviceTypeStats[b.service_type] = b.count; });
+            return {
+                totalOrders: orders.length,
+                inProgressOrders: (orders.filter(o=> o.status==='in-progress').length),
+                completedToday: (orders.filter(o=> (o.status==='completed') && (o.departureTime||'').slice(0,10)===now.toISOString().slice(0,10)).length),
+                totalCustomers: summaryRes.success && summaryRes.data ? (summaryRes.data.totalCustomers||0):0,
+                serviceTypeStats,
+                dailyStats
+            };
+        }catch(e){
+            return { totalOrders:0,inProgressOrders:0,completedToday:0,totalCustomers:0,serviceTypeStats:{},dailyStats:[] };
+        }
+    }
+
     // Public API
     return {
         init: init,
@@ -241,7 +230,9 @@ var TrackingSystem = (function() {
         orders: orders,
         createCustomer: createCustomer,
         createOrder: createOrder,
-        api: api
+        api: api,
+        getCustomerById: getCustomerById,
+        getAnalytics: getAnalytics
     };
 })();
 
