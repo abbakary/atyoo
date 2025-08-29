@@ -71,6 +71,23 @@ def _map_order_type(service_type: str) -> str:
     return Order.SERVICE
 
 
+def _generate_seq(prefix: str, model, field: str = 'number') -> str:
+    now = _now()
+    ymd = now.strftime('%Y%m%d')
+    start = now.replace(hour=0, minute=0, second=0, microsecond=0)
+    end = start + timedelta(days=1)
+    count = model.objects.filter(created_at__gte=start, created_at__lt=end).count() + 1
+    return f"{prefix}-{ymd}-{str(count).zfill(3)}"
+
+
+def _generate_job_card_and_invoice(order: 'Order') -> None:
+    # Create JobCard & Invoice if not yet existing
+    if not hasattr(order, 'job_card'):
+        JobCard.objects.create(number=_generate_seq('JC', JobCard), order=order)
+    if not hasattr(order, 'invoice'):
+        Invoice.objects.create(number=_generate_seq('INV', Invoice), order=order, status=Invoice.DRAFT)
+
+
 def _json(request: HttpRequest) -> Dict[str, Any]:
     try:
         return json.loads(request.body.decode('utf-8')) if request.body else {}
