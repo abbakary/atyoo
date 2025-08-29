@@ -191,6 +191,10 @@ var TrackingSystem = (function() {
             .catch(()=>null);
     }
 
+    function searchCustomers(q){
+        return api.searchCustomers(q);
+    }
+
     async function getAnalytics(){
         try{
             const [summaryRes, ordersRes] = await Promise.all([
@@ -232,7 +236,8 @@ var TrackingSystem = (function() {
         createOrder: createOrder,
         api: api,
         getCustomerById: getCustomerById,
-        getAnalytics: getAnalytics
+        getAnalytics: getAnalytics,
+        searchCustomers: searchCustomers
     };
 })();
 
