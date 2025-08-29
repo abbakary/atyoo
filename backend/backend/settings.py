@@ -1,8 +1,10 @@
-import os
 from pathlib import Path
+import os
 
-BASE_DIR = Path(__file__).resolve().parent.parent.parent
-SECRET_KEY = 'django-insecure-for-dev-only'
+# Base directory of the repository (two levels up from this file)
+BASE_DIR = Path(__file__).resolve().parents[2]
+
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'dev-secret-key-change-in-prod')
 DEBUG = True
 ALLOWED_HOSTS = ['*']
 
@@ -13,7 +15,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'tracking',
+    'tracking.apps.TrackingConfig',
 ]
 
 MIDDLEWARE = [
@@ -23,14 +25,15 @@ MIDDLEWARE = [
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'backend.urls'
+ROOT_URLCONF = 'backend.backend.urls'
 
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [str(BASE_DIR / 'templates')],
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -39,11 +42,14 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
             ],
+            # Allow using {% static %} without {% load static %} in templates already present
+            'builtins': ['django.templatetags.static'],
         },
     },
 ]
 
-WSGI_APPLICATION = 'backend.wsgi.application'
+WSGI_APPLICATION = 'backend.backend.wsgi.application'
+ASGI_APPLICATION = 'backend.backend.asgi.application'
 
 DATABASES = {
     'default': {
@@ -52,14 +58,30 @@ DATABASES = {
     }
 }
 
+AUTH_PASSWORD_VALIDATORS = [
+    {
+        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+    },
+]
+
 LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_TZ = True
 
 STATIC_URL = '/static/'
+# Serve app static assets (e.g., assets/css, tracking-system.js)
 STATICFILES_DIRS = [
-    str(BASE_DIR / 'backend'),  # For tracking-system.js and tracking-dashboard.js
+    BASE_DIR / 'backend' / 'tracking' / 'static',
 ]
-STATIC_ROOT = str(BASE_DIR / 'staticfiles')
+
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
