@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import os
 import sys
+from pathlib import Path
 
 def main():
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'backend.backend.settings')
