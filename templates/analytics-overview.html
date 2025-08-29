@@ -96,7 +96,8 @@
       const line = echarts.init(document.getElementById('overviewOrdersLine'));
       const days = stats.dailyStats || [];
       line.setOption({tooltip:{trigger:'axis'},xAxis:{type:'category',data:days.map(d=>d.date.split(' ').slice(0,3).join(' '))},yAxis:{type:'value'},series:[{type:'line',data:days.map(d=>d.orders)}]});
-    })();
+      };
+      onReady();
   </script>
 </body>
 </html>
