@@ -1,13 +1,24 @@
 from pathlib import Path
 import os
 
-# Base directory of the repository (two levels up from this file)
-BASE_DIR = Path(__file__).resolve().parents[2]
+# Base directory of the Django project (folder containing manage.py)
+BASE_DIR = Path(__file__).resolve().parent.parent  # .../backend
 
+# SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'dev-secret-key-change-in-prod')
-DEBUG = True
-ALLOWED_HOSTS = ['*']
 
+# SECURITY WARNING: don't run with debug turned on in production!
+DEBUG = True
+
+# Allow all hosts for the embedded dev environment
+ALLOWED_HOSTS = ['*']
+CSRF_TRUSTED_ORIGINS = [
+    'http://localhost:3000',
+    'http://127.0.0.1:3000',
+    'http://0.0.0.0:3000',
+]
+
+# Application definition
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -15,7 +26,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'tracking.apps.TrackingConfig',
+    'tracking',
 ]
 
 MIDDLEWARE = [
@@ -33,7 +44,10 @@ ROOT_URLCONF = 'backend.backend.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates'],
+        'DIRS': [
+            # Top-level templates directory at repo root
+            (BASE_DIR.parent / 'templates').resolve(),
+        ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -42,8 +56,6 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
             ],
-            # Allow using {% static %} without {% load static %} in templates already present
-            'builtins': ['django.templatetags.static'],
         },
     },
 ]
@@ -51,37 +63,36 @@ TEMPLATES = [
 WSGI_APPLICATION = 'backend.backend.wsgi.application'
 ASGI_APPLICATION = 'backend.backend.asgi.application'
 
+# Database
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': str(BASE_DIR / 'db.sqlite3'),
+        'NAME': (BASE_DIR / 'db.sqlite3').resolve(),
     }
 }
 
+# Password validation
 AUTH_PASSWORD_VALIDATORS = [
-    {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
-    },
+    {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]
 
+# Internationalization
 LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_TZ = True
 
+# Static files (CSS, JavaScript, Images)
 STATIC_URL = '/static/'
-# Serve app static assets (e.g., assets/css, tracking-system.js)
+
+# Include the tracking app's static folder and root of tracking for loose files like tracking-system.js
 STATICFILES_DIRS = [
-    BASE_DIR / 'backend' / 'tracking' / 'static',
+    (BASE_DIR / 'tracking' / 'static').resolve(),
+    (BASE_DIR / 'tracking').resolve(),
 ]
 
+# Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
