@@ -197,7 +197,7 @@ class CustomerCreateApi(View):
         address = (data.get('address') or '').strip()
         organization_name = (data.get('organizationName') or '').strip()
         tax_number = (data.get('taxNumber') or '').strip()
-        personal_subtype = (data.get('personalType') or '').strip()
+        personal_subtype = (data.get('personalSubType') or data.get('personalType') or '').strip()
         notes = (data.get('notes') or '').strip()
 
         if Customer.objects.filter(phone=phone).exists():
