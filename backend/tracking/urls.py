@@ -3,6 +3,9 @@ from django.urls import path, re_path
 from . import views
 
 urlpatterns = [
+    path('login/', views.LoginView.as_view(), name='login'),
+    path('logout/', views.LogoutView.as_view(), name='logout'),
+
     path('', views.DashboardView.as_view(), name='dashboard'),
 
     # Pages
@@ -31,6 +34,11 @@ urlpatterns = [
     path('settings/services/', views.SettingsServicesView.as_view(), name='settings_services'),
     path('settings/users/', views.SettingsUsersView.as_view(), name='settings_users'),
     path('settings/backup/', views.SettingsBackupView.as_view(), name='settings_backup'),
+
+    # Admin panel (custom)
+    path('admin-panel/dashboard/', views.AdminDashboardView.as_view(), name='admin_dashboard'),
+    path('admin-panel/users/', views.UserManagementView.as_view(), name='admin_users'),
+    path('admin-panel/inventory/', views.InventoryManagementView.as_view(), name='admin_inventory'),
 
     # APIs
     path('api/customers/', views.CustomerCreateApi.as_view(), name='api_customer_create'),  # POST
