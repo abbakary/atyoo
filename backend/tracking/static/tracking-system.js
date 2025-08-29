@@ -82,6 +82,19 @@ var TrackingSystem = (function() {
 
     // API endpoints
     const api = {
+        _handleResponse: function(response){
+            return response.text().then(text => {
+                let data = {};
+                try { data = text ? JSON.parse(text) : {}; } catch (e) {
+                    return { success: false, error: 'Invalid server response' };
+                }
+                if (!response.ok) {
+                    const msg = (data && (data.error || data.detail)) || `Request failed (${response.status})`;
+                    return { success: false, error: msg };
+                }
+                return data;
+            });
+        },
         createCustomer: function(customerData) {
             return fetch('/api/customers/', {
                 method: 'POST',
@@ -89,24 +102,25 @@ var TrackingSystem = (function() {
                     'Content-Type': 'application/json',
                     'X-CSRFToken': getCsrfToken()
                 },
+                credentials: 'same-origin',
                 body: JSON.stringify(customerData)
             })
-            .then(response => response.json())
+            .then(this._handleResponse)
             .catch(error => {
                 console.error('API Error:', error);
                 return { success: false, error: 'Network error occurred' };
             });
         },
-        
+
         searchCustomers: function(query) {
-            return fetch(`/api/customers/search/?q=${encodeURIComponent(query)}`)
-                .then(response => response.json())
+            return fetch(`/api/customers/search/?q=${encodeURIComponent(query)}`, { credentials: 'same-origin' })
+                .then(this._handleResponse)
                 .catch(error => {
                     console.error('API Error:', error);
                     return { success: false, error: 'Network error occurred' };
                 });
         },
-        
+
         createOrder: function(orderData) {
             return fetch('/api/orders/', {
                 method: 'POST',
@@ -114,9 +128,10 @@ var TrackingSystem = (function() {
                     'Content-Type': 'application/json',
                     'X-CSRFToken': getCsrfToken()
                 },
+                credentials: 'same-origin',
                 body: JSON.stringify(orderData)
             })
-            .then(response => response.json())
+            .then(this._handleResponse)
             .catch(error => {
                 console.error('API Error:', error);
                 return { success: false, error: 'Network error occurred' };
@@ -153,12 +168,10 @@ var TrackingSystem = (function() {
         // Call the backend API
         return api.createCustomer(customerData)
             .then(result => {
-                if (result.success) {
-                    // Also store in localStorage for immediate frontend use
-                    // Do not store to localStorage; rely on backend as source of truth
+                if (result && result.success && result.customer) {
                     utils.log('Customer created successfully: ' + result.customer.id);
                 }
-                return result;
+                return result || { success: false, error: 'Unknown error' };
             });
     }
 
@@ -177,10 +190,10 @@ var TrackingSystem = (function() {
         // Call the backend API
         return api.createOrder(orderData)
             .then(result => {
-                if (result.success) {
+                if (result && result.success && result.order) {
                     utils.log('Order created successfully: ' + result.order.orderNumber);
                 }
-                return result;
+                return result || { success: false, error: 'Unknown error' };
             });
     }
 
