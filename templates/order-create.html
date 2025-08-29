@@ -450,6 +450,178 @@
         document.getElementById('backToStep3').addEventListener('click', ()=>showStep(3));
         document.getElementById('backToStep4').addEventListener('click', ()=>showStep(4));
 
+        function renderServiceDetails(serviceType){
+          const c = document.getElementById('serviceDetailsContent');
+          if(!c) return;
+          if(serviceType==='car-service'){
+            c.innerHTML = `
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label for="plateNumber" class="form-label">Plate Number</label>
+                  <input type="text" class="form-control" id="plateNumber" required>
+                  <div class="invalid-feedback" id="plateNumberFeedback"></div>
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label for="carMake" class="form-label">Car Make</label>
+                  <input type="text" class="form-control" id="carMake" required>
+                  <div class="invalid-feedback" id="carMakeFeedback"></div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label for="carModel" class="form-label">Car Model</label>
+                  <input type="text" class="form-control" id="carModel" required>
+                  <div class="invalid-feedback" id="carModelFeedback"></div>
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label for="vehicleType" class="form-label">Vehicle Type</label>
+                  <select class="form-select" id="vehicleType" required>
+                    <option value="">Select vehicle type</option>
+                    <option value="sedan">Sedan</option>
+                    <option value="suv">SUV</option>
+                    <option value="truck">Truck</option>
+                    <option value="van">Van</option>
+                    <option value="pickup">Pickup</option>
+                  </select>
+                  <div class="invalid-feedback" id="vehicleTypeFeedback"></div>
+                </div>
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Select Services</label>
+                <div class="row">
+                  <div class="col-md-4"><div class="form-check"><input class="form-check-input" type="checkbox" name="carServices" value="oil-change" id="svc1"><label class="form-check-label" for="svc1">Oil Change</label></div></div>
+                  <div class="col-md-4"><div class="form-check"><input class="form-check-input" type="checkbox" name="carServices" value="engine-diagnostics" id="svc2"><label class="form-check-label" for="svc2">Engine Diagnostics</label></div></div>
+                  <div class="col-md-4"><div class="form-check"><input class="form-check-input" type="checkbox" name="carServices" value="brake-repair" id="svc3"><label class="form-check-label" for="svc3">Brake Repair</label></div></div>
+                  <div class="col-md-4"><div class="form-check"><input class="form-check-input" type="checkbox" name="carServices" value="tire-rotation" id="svc4"><label class="form-check-label" for="svc4">Tire Rotation</label></div></div>
+                  <div class="col-md-4"><div class="form-check"><input class="form-check-input" type="checkbox" name="carServices" value="wheel-alignment" id="svc5"><label class="form-check-label" for="svc5">Wheel Alignment</label></div></div>
+                  <div class="col-md-4"><div class="form-check"><input class="form-check-input" type="checkbox" name="carServices" value="battery-check" id="svc6"><label class="form-check-label" for="svc6">Battery Check</label></div></div>
+                  <div class="col-md-4"><div class="form-check"><input class="form-check-input" type="checkbox" name="carServices" value="fluid-topup" id="svc7"><label class="form-check-label" for="svc7">Fluid Top-Up</label></div></div>
+                </div>
+                <div class="invalid-feedback d-block" id="carServicesFeedback" style="display:none"></div>
+              </div>
+              <div class="mb-3">
+                <label for="problemDescription" class="form-label">Problem Description</label>
+                <textarea class="form-control" id="problemDescription" rows="3"></textarea>
+              </div>`;
+          } else if(serviceType==='tire-sales'){
+            c.innerHTML = `
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label for="tireItemName" class="form-label">Item Name</label>
+                  <select class="form-select" id="tireItemName" required>
+                    <option value="">Select tire type</option>
+                    <option value="all-season">All-Season</option>
+                    <option value="summer">Summer</option>
+                    <option value="winter">Winter</option>
+                    <option value="performance">Performance</option>
+                    <option value="off-road">Off-Road</option>
+                    <option value="eco">Eco-Friendly</option>
+                    <option value="run-flat">Run-Flat</option>
+                  </select>
+                  <div class="invalid-feedback" id="tireItemNameFeedback"></div>
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label for="tireBrand" class="form-label">Brand</label>
+                  <select class="form-select" id="tireBrand" required>
+                    <option value="">Select brand</option>
+                    <option value="michelin">Michelin</option>
+                    <option value="bridgestone">Bridgestone</option>
+                    <option value="goodyear">Goodyear</option>
+                    <option value="continental">Continental</option>
+                    <option value="pirelli">Pirelli</option>
+                    <option value="other">Other</option>
+                  </select>
+                  <div class="invalid-feedback" id="tireBrandFeedback"></div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label for="tireQuantity" class="form-label">Quantity</label>
+                  <input type="number" class="form-control" id="tireQuantity" min="1" value="1" required>
+                  <div class="invalid-feedback" id="tireQuantityFeedback"></div>
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label for="tireType" class="form-label">Condition</label>
+                  <select class="form-select" id="tireType" required>
+                    <option value="">Select condition</option>
+                    <option value="new">New</option>
+                    <option value="used">Used</option>
+                    <option value="refurbished">Refurbished</option>
+                  </select>
+                  <div class="invalid-feedback" id="tireTypeFeedback"></div>
+                </div>
+              </div>`;
+          } else if(serviceType==='consultation'){
+            c.innerHTML = `
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label for="inquiryType" class="form-label">Inquiry Type</label>
+                  <select class="form-select" id="inquiryType" required>
+                    <option value="">Select type</option>
+                    <option value="pricing">Pricing</option>
+                    <option value="services">Services</option>
+                    <option value="appointment-booking">Appointment Booking</option>
+                    <option value="general">General</option>
+                    <option value="vehicle-purchase">Vehicle Purchase</option>
+                    <option value="service-advice">Service Advice</option>
+                    <option value="maintenance-plan">Maintenance Plan</option>
+                    <option value="upgrade-options">Upgrade Options</option>
+                    <option value="other">Other</option>
+                  </select>
+                  <div class="invalid-feedback" id="inquiryTypeFeedback"></div>
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label for="contactPreference" class="form-label">Contact Preference</label>
+                  <select class="form-select" id="contactPreference" required>
+                    <option value="">Select preference</option>
+                    <option value="phone">Phone</option>
+                    <option value="email">Email</option>
+                  </select>
+                  <div class="invalid-feedback" id="contactPreferenceFeedback"></div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label for="followUpDate" class="form-label">Follow-up Date (optional)</label>
+                  <input type="date" class="form-control" id="followUpDate">
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label for="inquiryQuestions" class="form-label">Questions</label>
+                  <textarea class="form-control" id="inquiryQuestions" rows="3" required></textarea>
+                  <div class="invalid-feedback" id="inquiryQuestionsFeedback"></div>
+                </div>
+              </div>`;
+          } else {
+            c.innerHTML = '<div class="alert alert-info">Please select a service type.</div>';
+          }
+          if(window.feather){feather.replace();}
+        }
+
+        function validateOrderFormV2(){
+          let ok=true; const t=document.getElementById('serviceType').value;
+          const mark=(id,msg)=>{const el=document.getElementById(id); if(!el||el.value) return; el.classList.add('is-invalid'); const fb=document.getElementById(id+"Feedback"); if(fb){fb.textContent=msg||'Required';} ok=false;};
+          if(!document.getElementById('customerId').value){ok=false; document.getElementById('customerSearch').classList.add('is-invalid');}
+          if(!t){ok=false; document.getElementById('serviceTypeFeedback').textContent='Please select a service type.';}
+          if(t==='car-service'){
+            mark('plateNumber','Plate number is required.');
+            mark('carMake','Car make is required.');
+            mark('carModel','Car model is required.');
+            mark('vehicleType','Vehicle type is required.');
+            const anySvc = document.querySelectorAll('input[name="carServices"]:checked').length>0;
+            if(!anySvc){const fb=document.getElementById('carServicesFeedback'); if(fb){fb.style.display='block'; fb.textContent='Select at least one service.';} ok=false;}
+          } else if(t==='tire-sales'){
+            mark('tireItemName','Item name is required.');
+            mark('tireBrand','Brand is required.');
+            const qty=document.getElementById('tireQuantity'); if(qty && (!qty.value || parseInt(qty.value)<1)){qty.classList.add('is-invalid'); const fb=document.getElementById('tireQuantityFeedback'); if(fb){fb.textContent='Quantity must be at least 1.';} ok=false;}
+            mark('tireType','Condition is required.');
+          } else if(t==='consultation'){
+            mark('inquiryType','Inquiry type is required.');
+            mark('contactPreference','Contact preference is required.');
+            mark('inquiryQuestions','Please provide your questions.');
+          }
+          return ok;
+        }
+
         function showServiceDetails(serviceType){const container=document.getElementById('serviceDetailsContent');container.innerHTML='<div class="text-center"><div class="spinner-border text-primary" role="status"><span class="sr-only">Loading...</span></div></div>'; setTimeout(()=>{let html=''; if(serviceType==='car-service'){html=`<div class="row"><div class="col-md-6 mb-3"><label for="plateNumber" class="form-label">Plate Number</label><input type="text" class="form-control" id="plateNumber" name="plateNumber" placeholder="e.g. T123 ABC" required><div class="invalid-feedback" id="plateNumberFeedback"></div></div><div class="col-md-6 mb-3"><label for="carMake" class="form-label">Car Make</label><input type="text" class="form-control" id="carMake" name="carMake" placeholder="e.g. Toyota, Honda, Ford" required><div class="invalid-feedback" id="carMakeFeedback"></div></div></div><div class="row"><div class="col-md-6 mb-3"><label for="carModel" class="form-label">Car Model</label><input type="text" class="form-control" id="carModel" name="carModel" placeholder="e.g. Camry, Civic, Mustang" required><div class="invalid-feedback" id="carModelFeedback"></div></div><div class="col-md-6 mb-3"><label for="vehicleType" class="form-label">Vehicle Type</label><select class="form-select" id="vehicleType" name="vehicleType" required><option value="">Select vehicle type</option><option value="sedan">Sedan</option><option value="suv">SUV</option><option value="truck">Truck</option><option value="van">Van</option><option value="motorcycle">Motorcycle</option><option value="other">Other</option></select><div class="invalid-feedback" id="vehicleTypeFeedback"></div></div></div><div class="row"><div class="col-md-12 mb-3"><label class="form-label">Service Selection</label><div class="service-checkbox-group"><div class="form-check"><input class="form-check-input" type="checkbox" name="carServices" value="oil-change" id="serviceOilChange"><label class="form-check-label" for="serviceOilChange">Oil Change</label></div><div class="form-check"><input class="form-check-input" type="checkbox" name="carServices" value="engine-diagnostics" id="serviceEngineDiagnostics"><label class="form-check-label" for="serviceEngineDiagnostics">Engine Diagnostics</label></div><div class="form-check"><input class="form-check-input" type="checkbox" name="carServices" value="brake-repair" id="serviceBrakeRepair"><label class="form-check-label" for="serviceBrakeRepair">Brake Repair</label></div><div class="form-check"><input class="form-check-input" type="checkbox" name="carServices" value="tire-rotation" id="serviceTireRotation"><label class="form-check-label" for="serviceTireRotation">Tire Rotation</label></div><div class="form-check"><input class="form-check-input" type="checkbox" name="carServices" value="wheel-alignment" id="serviceWheelAlignment"><label class="form-check-label" for="serviceWheelAlignment">Wheel Alignment</label></div><div class="form-check"><input class="form-check-input" type="checkbox" name="carServices" value="battery-check" id="serviceBatteryCheck"><label class="form-check-label" for="serviceBatteryCheck">Battery Check</label></div><div class="form-check"><input class="form-check-input" type="checkbox" name="carServices" value="fluid-topup" id="serviceFluidTopUp"><label class="form-check-label" for="serviceFluidTopUp">Fluid Top-Up</label></div></div><div class="invalid-feedback" id="carServiceTypeFeedback"></div></div></div><div class="row"><div class="col-md-12 mb-3"><label for="problemDescription" class="form-label">Problem Description</label><textarea class="form-control" id="problemDescription" name="problemDescription" rows="3" placeholder="Describe the issue or service needed in detail"></textarea></div></div>`;} else if(serviceType==='tire-sales'){html=`<div class="row"><div class="col-md-6 mb-3"><label for="tireItemName" class="form-label">Item Name</label><select class="form-select" id="tireItemName" name="tireItemName" required><option value="">Select Tire Type</option><option value="all-season">All-Season</option><option value="summer">Summer</option><option value="winter">Winter</option><option value="performance">Performance</option><option value="off-road">Off-Road</option><option value="eco">Eco-Friendly</option><option value="run-flat">Run-Flat</option></select><div class="invalid-feedback" id="tireItemNameFeedback"></div></div><div class="col-md-6 mb-3"><label for="tireBrand" class="form-label">Brand</label><select class="form-select" id="tireBrand" name="tireBrand"><option value="">Select a brand</option><option value="michelin">Michelin</option><option value="bridgestone">Bridgestone</option><option value="goodyear">Goodyear</option><option value="continental">Continental</option><option value="pirelli">Pirelli</option><option value="other">Other</option></select><div class="invalid-feedback" id="tireBrandFeedback"></div></div></div><div class="row"><div class="col-md-6 mb-3"><label for="tireQuantity" class="form-label">Quantity</label><input type="number" class="form-control" id="tireQuantity" name="tireQuantity" min="1" value="1" required><div class="invalid-feedback" id="tireQuantityFeedback"></div></div><div class="col-md-6 mb-3"><label for="tireType" class="form-label">Tire Condition</label><select class="form-select" id="tireType" name="tireType" required><option value="">Select condition</option><option value="new">New</option><option value="used">Used</option><option value="refurbished">Refurbished</option></select><div class="invalid-feedback" id="tireTypeFeedback"></div></div></div>`;} else if(serviceType==='consultation'){html=`<div class="row"><div class="col-md-6 mb-3"><label for="inquiryType" class="form-label">Inquiry Type</label><select class="form-select" id="inquiryType" name="inquiryType" required><option value="">Select consultation type</option><option value="vehicle-purchase">Vehicle Purchase</option><option value="service-advice">Service Advice</option><option value="maintenance-plan">Maintenance Plan</option><option value="upgrade-options">Upgrade Options</option><option value="other">Other</option></select><div class="invalid-feedback" id="inquiryTypeFeedback"></div></div><div class="col-md-6 mb-3"><label for="contactPreference" class="form-label">Contact Preference</label><select class="form-select" id="contactPreference" name="contactPreference" required><option value="">Select preference</option><option value="phone">Phone</option><option value="email">Email</option></select><div class="invalid-feedback" id="contactPreferenceFeedback"></div></div></div><div class="row"><div class="col-md-6 mb-3"><label for="followUpDate" class="form-label">Follow-up Date (Optional)</label><input type="date" class="form-control" id="followUpDate" name="followUpDate"></div><div class="col-md-12 mb-3"><label for="inquiryQuestions" class="form-label">Questions</label><textarea class="form-control" id="inquiryQuestions" name="inquiryQuestions" rows="4" placeholder="Enter customer's questions here" required></textarea><div class="invalid-feedback" id="inquiryQuestionsFeedback"></div></div></div>`;} container.innerHTML=html; $('#serviceDetailsContent').on('change','input, select, textarea',function(){updateOrderSummary();}); if(window.feather){feather.replace();}},300);}
 
         function updateOrderSummary(){const summary=document.getElementById('orderSummaryContent'); if(!summary) return; const customerName=document.getElementById('customerName')?.textContent||'Not selected'; const serviceType=document.getElementById('serviceType')?.value||''; const priority=document.getElementById('priority')?.value||'Normal'; const estimatedDuration=document.getElementById('estimatedDuration')?.value||'60'; const notes=document.getElementById('notes')?.value||'None'; if(!document.getElementById('customerId').value){summary.innerHTML='<div class="text-center text-muted py-4"><i data-feather="file-text" class="summary-icon-48"></i><p class="mt-2">Order summary will appear here as you fill in the form</p></div>'; if(window.feather){feather.replace();} return;} if(!serviceType){summary.innerHTML=`<div class="order-summary-item"><span>Customer</span><span>${customerName}</span></div><div class="text-center text-muted py-3">Please select a service type.</div>`; if(window.feather){feather.replace();} return;} let serviceTypeName=''; let servicePrice=0; if(serviceType==='car-service'){serviceTypeName='Car Service'; servicePrice=100; const selectedServices=Array.from(document.querySelectorAll('input[name="carServices"]:checked')).map(cb=>cb.nextElementSibling.textContent); if(selectedServices.length>0){servicePrice+=selectedServices.length*25; summary.insertAdjacentHTML('beforeend', `<div class="order-summary-item"><span>Services</span><span style="text-align:right;max-width:60%">${selectedServices.join(', ')}</span></div>`);} } else if(serviceType==='tire-sales'){serviceTypeName='Tire Sales'; servicePrice=200; const qty=parseInt(document.getElementById('tireQuantity')?.value||'1'); servicePrice*=qty;} else if(serviceType==='consultation'){serviceTypeName='Consultation'; servicePrice=50;} let priorityMultiplier=1; if(priority==='high') priorityMultiplier=1.2; else if(priority==='urgent') priorityMultiplier=1.5; let totalPrice=servicePrice*priorityMultiplier; if(estimatedDuration){const hours=estimatedDuration/60; totalPrice+=hours*50;} const formatted=totalPrice.toFixed(2); summary.innerHTML=`<div class=\"order-summary-item\"><span>Customer</span><span>${customerName}</span></div><div class=\"order-summary-item\"><span>Service Type</span><span>${serviceTypeName}</span></div><div class=\"order-summary-item\"><span>Priority</span><span>${priority.charAt(0).toUpperCase()+priority.slice(1)}</span></div><div class=\"order-summary-item\"><span>Estimated Duration</span><span>${estimatedDuration} minutes</span></div><div class=\"order-summary-item\"><span>Total Price</span><span>$${formatted}</span></div>`; if(window.feather){feather.replace();}}
