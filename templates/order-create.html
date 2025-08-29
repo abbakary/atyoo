@@ -437,7 +437,7 @@
         document.getElementById('searchCustomerBtn').addEventListener('click', runCustomerSearch);
         document.getElementById('customerSearch').addEventListener('keydown', function(e){ if(e.key==='Enter'){ e.preventDefault(); runCustomerSearch(); }});
         let searchTimer=null; document.getElementById('customerSearch').addEventListener('input', function(){ clearTimeout(searchTimer); const v=this.value.trim(); if(v.length<3){ document.getElementById('customerSearchResults').classList.add('d-none'); return;} searchTimer=setTimeout(runCustomerSearch, 300); });
-        function runCustomerSearch(){const term=document.getElementById('customerSearch').value.trim();document.getElementById('customerSearch').classList.remove('is-invalid'); if(!term){document.getElementById('customerSearch').classList.add('is-invalid');document.getElementById('customerSearchFeedback').textContent='Please enter a search term';return;} try{const results=TrackingSystem.searchCustomers(term)||[]; if(results.length===0){document.getElementById('customerResultsList').innerHTML='<div class="text-center text-muted py-3">No customers found</div>';document.getElementById('customerSearchResults').classList.remove('d-none');} else {renderCustomerResults(results); document.getElementById('customerSearchResults').classList.remove('d-none');}}catch(e){console.error(e);showUserMessage('Failed to search customers','error');}}
+        function runCustomerSearch(){const term=document.getElementById('customerSearch').value.trim();document.getElementById('customerSearch').classList.remove('is-invalid'); if(!term){document.getElementById('customerSearch').classList.add('is-invalid');document.getElementById('customerSearchFeedback').textContent='Please enter a search term';return;} TrackingSystem.searchCustomers(term).then(res=>{const results=(res&&res.results)||[]; if(results.length===0){document.getElementById('customerResultsList').innerHTML='<div class="text-center text-muted py-3">No customers found</div>';document.getElementById('customerSearchResults').classList.remove('d-none');} else {renderCustomerResults(results); document.getElementById('customerSearchResults').classList.remove('d-none');}}).catch(e=>{console.error(e);showUserMessage('Failed to search customers','error');});}
         document.getElementById('newCustomerBtn').addEventListener('click', function(){window.location.href = '{% url 'customer_register' %}';});
 
         document.querySelectorAll('.service-card').forEach(card=>{card.addEventListener('click',function(){document.querySelectorAll('.service-card').forEach(c=>c.classList.remove('selected'));this.classList.add('selected');const type=this.getAttribute('data-service-type');document.getElementById('serviceType').value=type;document.getElementById('serviceType').classList.remove('is-invalid');showServiceDetails(type);updateOrderSummary();});});
@@ -604,7 +604,7 @@
           }
         });
 
-        function initFromUrl(){const params=new URLSearchParams(window.location.search); const cid=params.get('customerId'); if(cid){const customer=TrackingSystem.getCustomerById(cid); if(customer){selectCustomer(customer);} }
+        function initFromUrl(){const params=new URLSearchParams(window.location.search); const cid=params.get('customerId'); if(cid){TrackingSystem.getCustomerById(cid).then(customer=>{ if(customer){ selectCustomer(customer);} });}
         }
 
         function bootstrap(){if(window.feather){feather.replace();} initFromUrl(); showStep(1);} bootstrap();
