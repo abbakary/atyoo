@@ -16,35 +16,7 @@ var TrackingDashboard = (function() {
         inProgress: 0
     };
 
-    // Sample data for demonstration
-    const sampleData = {
-        customers: [
-            { id: 1, name: 'John Doe', phone: '+256701234567', email: 'john@email.com', type: 'personal' },
-            { id: 2, name: 'Jane Smith', phone: '+256709876543', email: 'jane@email.com', type: 'business' },
-            { id: 3, name: 'Bob Wilson', phone: '+256705555555', email: 'bob@email.com', type: 'personal' }
-        ],
-        orders: [
-            {
-                id: 'ORD-001',
-                customerId: 1,
-                customerName: 'John Doe',
-                service: 'Tire Sales',
-                status: 'in-progress',
-                arrivalTime: new Date(Date.now() - 2 * 60 * 60 * 1000), // 2 hours ago
-                estimatedDuration: '2hr'
-            },
-            {
-                id: 'ORD-002',
-                customerId: 2,
-                customerName: 'Jane Smith',
-                service: 'Car Service',
-                status: 'completed',
-                arrivalTime: new Date(Date.now() - 4 * 60 * 60 * 1000), // 4 hours ago
-                departureTime: new Date(Date.now() - 1 * 60 * 60 * 1000), // 1 hour ago
-                estimatedDuration: '3hr'
-            }
-        ]
-    };
+    // No sample data in production
 
     // Initialize dashboard
     function init() {
@@ -81,15 +53,8 @@ var TrackingDashboard = (function() {
         document.head.appendChild(script);
     }
 
-    // Initialize sample data in localStorage if not exists
-    function initializeData() {
-        if (!localStorage.getItem('trackingSystem_customers')) {
-            localStorage.setItem('trackingSystem_customers', JSON.stringify(sampleData.customers));
-        }
-        if (!localStorage.getItem('trackingSystem_orders')) {
-            localStorage.setItem('trackingSystem_orders', JSON.stringify(sampleData.orders));
-        }
-    }
+    // No-op: rely on backend APIs
+    function initializeData() {}
 
     // Update statistics cards
     function updateStatistics() {
