@@ -8,7 +8,7 @@ def main():
     venv_site = Path(__file__).resolve().parent / 'venv' / 'Lib' / 'site-packages'
     if venv_site.exists():
         sys.path.append(str(venv_site))
-    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'backend.backend.settings')
+    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'settings')
     try:
         from django.core.management import execute_from_command_line
     except ImportError as exc:
