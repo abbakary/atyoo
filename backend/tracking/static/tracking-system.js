@@ -198,9 +198,9 @@ var TrackingSystem = (function() {
     }
 
     function getCustomerById(id){
-        return fetch(`/api/customers/${encodeURIComponent(id)}/`)
-            .then(r=>r.json())
-            .then(res=>res.success ? res.customer : null)
+        return fetch(`/api/customers/${encodeURIComponent(id)}/`, { credentials: 'same-origin' })
+            .then(api._handleResponse)
+            .then(res=>res && res.success ? res.customer : null)
             .catch(()=>null);
     }
 
