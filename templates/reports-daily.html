@@ -1,0 +1,45 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tracking System - Daily Reports</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" type="text/css" href="{% static 'assets/css/vendors/bootstrap.css' %}">
+  <link rel="stylesheet" type="text/css" href="{% static 'assets/css/style.css' %}">
+  <link id="color" rel="stylesheet" href="{% static 'assets/css/color-1.css' %}" media="screen">
+  <link rel="stylesheet" type="text/css" href="{% static 'assets/css/responsive.css' %}">
+</head>
+<body>
+  <div class="page-wrapper compact-wrapper" id="pageWrapper">
+    <div class="page-header"><div class="header-wrapper row m-0"><div class="left-header col"><div class="d-flex align-items-center gap-2 "><h4 class="f-w-600">Daily Reports</h4></div></div></div></div>
+    <div class="page-body-wrapper"><div class="page-body"><div class="container-fluid">
+      <div class="card"><div class="card-header d-flex justify-content-between align-items-center"><h5>Today</h5><button class="btn btn-outline-primary btn-sm" id="exportDaily">Export CSV</button></div>
+        <div class="card-body table-responsive">
+          <table class="table table-striped" id="dailyTable"><thead><tr><th>Order #</th><th>Customer</th><th>Service</th><th>Status</th><th>Arrival</th><th>Departure</th></tr></thead><tbody></tbody></table>
+        </div>
+      </div>
+    </div></div>
+      <footer class="footer"><div class="container-fluid"><div class="row"><div class="col-md-12 footer-copyright text-center"><p class="mb-0">Copyright 2024 © Tracking System All rights reserved.</p></div></div></div></footer>
+    </div>
+  </div>
+  <script src="{% static 'assets/js/jquery.min.js' %}"></script>
+  <script src="{% static 'assets/js/bootstrap/bootstrap.bundle.min.js' %}"></script>
+  <script src="{% static 'tracking-system.js' %}"></script>
+  <script>
+    (function(){
+      const today = new Date().toDateString();
+      const rows = TrackingSystem.getAllOrders().filter(o=> new Date(o.arrivalTime).toDateString()===today);
+      const tb = document.querySelector('#dailyTable tbody');
+      rows.forEach(o=>{const c = TrackingSystem.getCustomerById(o.customerId); const tr=document.createElement('tr'); tr.innerHTML=`<td>${o.orderNumber}</td><td>${c?c.name:o.customerName}</td><td>${o.serviceType}</td><td>${o.status}</td><td>${new Date(o.arrivalTime).toLocaleString()}</td><td>${o.departureTime?new Date(o.departureTime).toLocaleString():''}</td>`; tb.appendChild(tr);});
+      document.getElementById('exportDaily').addEventListener('click', function(){
+        const headers = ['Order #','Customer','Service','Status','Arrival','Departure'];
+        const data = rows.map(o=>{const c=TrackingSystem.getCustomerById(o.customerId);return [o.orderNumber,(c?c.name:o.customerName),o.serviceType,o.status,new Date(o.arrivalTime).toLocaleString(),o.departureTime?new Date(o.departureTime).toLocaleString():''];});
+        const csv = [headers, ...data].map(r=> r.map(x=>`"${String(x).replace(/"/g,'""')}"`).join(',')).join('\n');
+        const blob = new Blob([csv], {type:'text/csv'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='daily_report.csv'; a.click();
+      });
+    })();
+  </script>
+</body>
+</html>

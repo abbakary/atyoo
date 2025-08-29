@@ -1,0 +1,84 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Customer Management</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" type="text/css" href="{% static 'assets/css/vendors/bootstrap.css' %}">
+  <link rel="stylesheet" type="text/css" href="{% static 'assets/css/style.css' %}">
+  <link id="color" rel="stylesheet" href="{% static 'assets/css/color-1.css' %}" media="screen">
+  <link rel="stylesheet" type="text/css" href="{% static 'assets/css/responsive.css' %}">
+</head>
+<body>
+  <div class="page-wrapper compact-wrapper" id="pageWrapper">
+    <div class="page-header"><div class="header-wrapper row m-0">
+      <div class="header-logo-wrapper col-auto p-0"><div class="logo-wrapper"><a href="{% url 'dashboard' %}"><img class="img-fluid for-light" src="{% static 'assets/images/logo/logo_dark.png' %}" alt=""><img class="img-fluid for-dark" src="{% static 'assets/images/logo/logo.png' %}" alt=""></a></div></div>
+      <div class="left-header col"><div class="d-flex align-items-center justify-content-between gap-2 "><h4 class="f-w-600">Customer Management</h4>
+        <div class="d-flex gap-2"><a class="btn btn-outline-primary btn-sm" href="{% url 'customer_register' %}">New Customer</a><a class="btn btn-outline-secondary btn-sm" href="{% url 'customer_search' %}">Search</a><button id="exportCsv" class="btn btn-outline-info btn-sm">Export CSV</button></div>
+      </div></div>
+    </div></div>
+    <div class="page-body-wrapper">
+      <div class="page-body"><div class="container-fluid">
+        <div class="card"><div class="card-header">
+          <div class="row g-2 align-items-end">
+            <div class="col-md-4"><label class="form-label">Search</label><input id="searchInput" class="form-control" placeholder="Name, phone, email or ID"></div>
+            <div class="col-md-3"><label class="form-label">Customer Type</label><select id="filterType" class="form-select"><option value="">All</option><option value="personal">Personal</option><option value="company">Private Company</option><option value="government">Government</option><option value="ngo">NGO</option><option value="bodaboda">Bodaboda</option></select></div>
+            <div class="col-md-3"><label class="form-label">Status</label><select id="filterStatus" class="form-select"><option value="">All</option><option value="active">Active</option><option value="inactive">Inactive</option><option value="vip">VIP</option><option value="blacklisted">Blacklisted</option></select></div>
+            <div class="col-md-2"><button id="resetFilters" class="btn btn-secondary w-100">Reset</button></div>
+          </div>
+        </div>
+        <div class="card-body table-responsive">
+          <table class="table table-striped align-middle" id="customersTable">
+            <thead><tr><th>Name</th><th>Phone</th><th>Email</th><th>Type</th><th>Total Orders</th><th>Last Visit</th><th>Status</th><th>Actions</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div></div>
+      </div></div>
+
+      <footer class="footer"><div class="container-fluid"><div class="row"><div class="col-md-12 footer-copyright text-center"><p class="mb-0">Copyright 2024 © Tracking System All rights reserved.</p></div></div></div></footer>
+    </div>
+  </div>
+
+  <!-- Edit Modal -->
+  <div class="modal fade" id="editCustomerModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+      <div class="modal-content">
+        <div class="modal-header"><h5 class="modal-title">Edit Customer</h5><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button></div>
+        <div class="modal-body">
+          <div class="row g-3">
+            <div class="col-lg-5">
+              <div class="card"><div class="card-header"><h6 class="mb-0">Profile</h6></div>
+                <div class="card-body">
+                  <div class="mb-2"><label class="form-label">Name</label><input id="ec_name" class="form-control"></div>
+                  <div class="mb-2"><label class="form-label">Phone</label><input id="ec_phone" class="form-control"></div>
+                  <div class="mb-2"><label class="form-label">Email</label><input id="ec_email" type="email" class="form-control"></div>
+                  <div class="mb-2"><label class="form-label">Address</label><input id="ec_address" class="form-control"></div>
+                  <div class="mb-2"><label class="form-label">Type</label><select id="ec_type" class="form-select"><option value="personal">Personal</option><option value="company">Private Company</option><option value="government">Government</option><option value="ngo">NGO</option><option value="bodaboda">Bodaboda</option></select></div>
+                  <div class="mb-2"><label class="form-label">Status</label><select id="ec_status" class="form-select"><option value="active">Active</option><option value="inactive">Inactive</option><option value="vip">VIP</option><option value="blacklisted">Blacklisted</option></select></div>
+                  <div class="mb-2"><label class="form-label">Notes</label><textarea id="ec_notes" rows="4" class="form-control"></textarea></div>
+                  <div class="d-flex justify-content-end gap-2"><button class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button><button id="ec_save" class="btn btn-primary">Save Changes</button></div>
+                </div></div>
+              <div class="mt-3 small text-muted">Created: <span id="ec_created"></span> • Updated: <span id="ec_updated"></span></div>
+            </div>
+            <div class="col-lg-7">
+              <div class="card mb-3"><div class="card-header d-flex justify-content-between align-items-center"><h6 class="mb-0">Vehicles</h6><button id="ec_addVehicle" class="btn btn-sm btn-outline-primary">Add</button></div>
+                <div class="card-body"><div id="ec_vehicles" class="row g-2"></div></div></div>
+              <div class="card"><div class="card-header"><h6 class="mb-0">Orders</h6></div>
+                <div class="card-body table-responsive">
+                  <table class="table table-sm" id="ec_orders"><thead><tr><th>Order #</th><th>Service</th><th>Status</th><th>Arrival</th><th>Actions</th></tr></thead><tbody></tbody></table>
+                </div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="{% static 'assets/js/jquery.min.js' %}"></script>
+  <script src="{% static 'assets/js/bootstrap/bootstrap.bundle.min.js' %}"></script>
+  <script src="{% static 'tracking-system.js' %}"></script>
+  <script src="{% static 'js/customer-manager.js' %}"></script>
+</body>
+</html>

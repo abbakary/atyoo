@@ -1,0 +1,721 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Customer & Order Tracking System">
+    <meta name="keywords" content="tracking, customer management, order management">
+    <meta name="author" content="Tracking App">
+    <meta name="csrf-token" content="{{ csrf_token }}">
+    <link rel="icon" href="{% static 'assets/images/favicon.png' %}" type="image/x-icon">
+    <link rel="shortcut icon" href="{% static 'assets/images/favicon.png' %}" type="image/x-icon">
+    <title>Tracking System - Customer Registration</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="{% static 'assets/css/font-awesome.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'assets/css/vendors/icofont.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'assets/css/vendors/themify.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'assets/css/vendors/flag-icon.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'assets/css/vendors/feather-icon.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'assets/css/vendors/bootstrap.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'assets/css/style.css' %}">
+    <link id="color" rel="stylesheet" href="{% static 'assets/css/color-1.css' %}" media="screen">
+    <link rel="stylesheet" type="text/css" href="{% static 'assets/css/responsive.css' %}">
+    <style>
+      .registration-container{background:#fff;border-radius:15px;padding:30px;box-shadow:0 4px 15px rgba(0,0,0,0.1);border:1px solid #e9ecef}
+      .progress-bar-container{margin-bottom:30px}.progress-bar{background:linear-gradient(135deg,#667eea 0%,#764ba2 100%)}
+      .step-content{display:none}.step-content.active{display:block;animation:fadeIn .5s}
+      @keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+      .step-title{font-size:1.5em;font-weight:600;color:#2c3e50;margin-bottom:25px}
+      .form-label{font-weight:500;color:#495057}.form-control,.form-select{border-radius:8px;border:1px solid #ced4da;padding:10px 15px}
+      .form-control:focus,.form-select:focus{border-color:#667eea;box-shadow:0 0 0 .25rem rgba(102,126,234,.25)}
+      .step-buttons{display:flex;justify-content:space-between;margin-top:30px;gap:12px}
+      @media (max-width:576px){.step-buttons{flex-direction:column}.step-buttons .btn{width:100%}}
+      .btn-primary{background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);border:none}
+      .service-intent-card{border:1px solid #e9ecef;border-radius:10px;padding:20px;text-align:center;cursor:pointer;transition:all .3s}
+      .service-intent-card:hover{transform:translateY(-5px);box-shadow:0 8px 25px rgba(0,0,0,.1)}
+      .service-intent-card.selected{border-color:#667eea;background-color:rgba(102,126,234,.05)}
+      .service-intent-card i{font-size:2.5rem;margin-bottom:15px;color:#667eea}
+      .invalid-feedback{display:none;color:#dc3545;font-size:.875em;margin-top:.25rem}
+      .form-control.is-invalid,.form-select.is-invalid{border-color:#dc3545}
+      .form-control.is-invalid~.invalid-feedback,.form-select.is-invalid~.invalid-feedback{display:block}
+      #organizationFields,#personalFields{display:none}
+      
+      /* Action Choice Buttons */
+      .action-choice-btn {
+        transition: all 0.3s ease;
+        border: 2px solid #e9ecef;
+        position: relative;
+        overflow: hidden;
+      }
+      .action-choice-btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+      }
+      .action-choice-btn i {
+        font-size: 1.5rem;
+        display: block;
+      }
+      .btn-outline-primary.action-choice-btn:hover {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-color: #667eea;
+      }
+      .btn-primary.action-choice-btn {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-color: #667eea;
+      }
+      .btn-primary.action-choice-btn:hover {
+        background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
+      }
+      
+      /* Notification Styles */
+      .notification {
+        padding: 12px 20px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        border-left: 4px solid;
+        animation: slideDown 0.3s ease;
+      }
+      .notification.success {
+        background-color: #d4edda;
+        border-color: #28a745;
+        color: #155724;
+      }
+      .notification.error {
+        background-color: #f8d7da;
+        border-color: #dc3545;
+        color: #721c24;
+      }
+      @keyframes slideDown {
+        from { opacity: 0; transform: translateY(-20px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+      
+      /* Beautiful Popup Modal Styles */
+      .popup-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.6);
+        backdrop-filter: blur(8px);
+        z-index: 9999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+      }
+      .popup-overlay.show {
+        opacity: 1;
+        visibility: visible;
+      }
+      .popup-card {
+        background: #fff;
+        border-radius: 20px;
+        padding: 40px;
+        max-width: 450px;
+        width: 90%;
+        text-align: center;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        transform: scale(0.8) translateY(-50px);
+        transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        position: relative;
+        overflow: hidden;
+      }
+      .popup-overlay.show .popup-card {
+        transform: scale(1) translateY(0);
+      }
+      .popup-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 5px;
+        background: linear-gradient(90deg, #667eea, #764ba2);
+      }
+      .popup-icon {
+        width: 80px;
+        height: 80px;
+        margin: 0 auto 25px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 35px;
+        color: #fff;
+        position: relative;
+        animation: iconPulse 2s infinite;
+      }
+      .popup-icon.success {
+        background: linear-gradient(135deg, #28a745, #20c997);
+        box-shadow: 0 0 0 0 rgba(40, 167, 69, 0.7);
+      }
+      .popup-icon.error {
+        background: linear-gradient(135deg, #dc3545, #e74c3c);
+        box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.7);
+      }
+      @keyframes iconPulse {
+        0% { box-shadow: 0 0 0 0 rgba(40, 167, 69, 0.7); }
+        70% { box-shadow: 0 0 0 20px rgba(40, 167, 69, 0); }
+        100% { box-shadow: 0 0 0 0 rgba(40, 167, 69, 0); }
+      }
+      .popup-icon.error {
+        animation-name: iconPulseError;
+      }
+      @keyframes iconPulseError {
+        0% { box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.7); }
+        70% { box-shadow: 0 0 0 20px rgba(220, 53, 69, 0); }
+        100% { box-shadow: 0 0 0 0 rgba(220, 53, 69, 0); }
+      }
+      .popup-title {
+        font-size: 24px;
+        font-weight: 700;
+        margin-bottom: 15px;
+        color: #2c3e50;
+      }
+      .popup-message {
+        font-size: 16px;
+        color: #6c757d;
+        margin-bottom: 30px;
+        line-height: 1.5;
+      }
+      .popup-actions {
+        display: flex;
+        gap: 12px;
+        justify-content: center;
+        flex-wrap: wrap;
+      }
+      .popup-btn {
+        padding: 12px 24px;
+        border-radius: 25px;
+        border: none;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-size: 14px;
+        min-width: 120px;
+      }
+      .popup-btn.primary {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: #fff;
+      }
+      .popup-btn.primary:hover {
+        background: linear-gradient(135deg, #5a6fd8, #6a4190);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+      }
+      .popup-btn.secondary {
+        background: #f8f9fa;
+        color: #6c757d;
+        border: 2px solid #e9ecef;
+      }
+      .popup-btn.secondary:hover {
+        background: #e9ecef;
+        color: #495057;
+        transform: translateY(-2px);
+      }
+      .popup-btn.danger {
+        background: linear-gradient(135deg, #dc3545, #e74c3c);
+        color: #fff;
+      }
+      .popup-btn.danger:hover {
+        background: linear-gradient(135deg, #c82333, #dc2626);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(220, 53, 69, 0.3);
+      }
+      
+      /* Loading Animation */
+      .rotating {
+        animation: rotate 1s linear infinite;
+      }
+      @keyframes rotate {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+      }
+      
+      /* Button disabled state */
+      .action-choice-btn:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none !important;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="loader-wrapper"><div class="loader"><div class="loader4"></div></div></div>
+    <div class="tap-top"><i data-feather="chevrons-up"></i></div>
+    <div class="page-wrapper compact-wrapper" id="pageWrapper">
+      <div class="page-header">
+        <div class="header-wrapper row m-0">
+          <form class="form-inline search-full col" action="#" method="get"><div class="form-group w-100"><div class="Typeahead Typeahead--twitterUsers"><div class="u-posRelative"><input class="demo-input Typeahead-input form-control-plaintext w-100" type="text" placeholder="Search customers, orders..." name="q" title="" autofocus><div class="spinner-border Typeahead-spinner" role="status"><span class="sr-only">Loading... </span></div><i class="close-search" data-feather="x"></i></div><div class="Typeahead-menu"> </div></div></div></form>
+          <div class="header-logo-wrapper col-auto p-0">
+            <div class="logo-wrapper"><a href="{% url 'dashboard' %}"><img class="img-fluid for-light" src="{% static 'assets/images/logo/logo_dark.png' %}" alt="logo-light"><img class="img-fluid for-dark" src="{% static 'assets/images/logo/logo.png' %}" alt="logo-dark"></a></div>
+            <div class="toggle-sidebar"><i class="status_toggle middle sidebar-toggle" data-feather="align-center"></i></div>
+          </div>
+          <div class="left-header col-xxl-5 col-xl-6 col-lg-5 col-md-4 col-sm-3 p-0">
+            <div><a class="toggle-sidebar" href="#"> <i class="iconly-Category icli"> </i></a><div class="d-flex align-items-center gap-2 "><h4 class="f-w-600"></h4></div></div>
+            <div class="welcome-content d-xl-block d-none"><span class="text-truncate col-12"></span></div>
+          </div>
+          <div class="nav-right col-xxl-7 col-xl-6 col-md-7 col-8 pull-right right-header p-0 ms-auto">
+            <ul class="nav-menus">
+              <li class="d-md-block d-none"><div class="form search-form mb-0"><div class="input-group"><span class="input-icon"><svg><use href="{% static 'assets/svg/icon-sprite.svg#search-header' %}"></use></svg><input class="w-100" type="search" placeholder="Search customers, orders..." id="headerSearch"></span></div></div></li>
+              <li><div class="mode"><i class="moon" data-feather="moon"> </i></div></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="page-body-wrapper">
+        <div class="sidebar-wrapper" sidebar-layout="stroke-svg">
+          <div>
+            <div class="logo-wrapper"> <a href="{% url 'dashboard' %}"><img class="img-fluid" src="{% static 'assets/images/logo/logo.png' %}" alt=""></a>
+              <div class="toggle-sidebar"><i class="status_toggle middle sidebar-toggle" data-feather="grid"> </i></div>
+            </div>
+            <div class="logo-icon-wrapper"><a href="{% url 'dashboard' %}"><img class="img-fluid" src="{% static 'assets/images/logo/logo-icon.png' %}" alt=""></a></div>
+            <nav class="sidebar-main">
+              <div class="left-arrow" id="left-arrow"><i data-feather="arrow-left"></i></div>
+              <div id="sidebar-menu">
+                <ul class="sidebar-links" id="simple-bar">
+                  <li class="back-btn"><a href="{% url 'dashboard' %}"><img class="img-fluid" src="{% static 'assets/images/logo/logo-icon.png' %}" alt=""></a><div class="mobile-back text-end"><span>Back</span><i class="fa fa-angle-right ps-2" aria-hidden="true"></i></div></li>
+                  <li class="sidebar-main-title"><div><h6>Main Menu</h6></div></li>
+                  <li class="sidebar-list"><a class="sidebar-link sidebar-title link-nav" href="{% url 'dashboard' %}"><svg class="stroke-icon"><use href="{% static 'assets/svg/icon-sprite.svg#stroke-home' %}"></use></svg><span>Dashboard</span></a></li>
+                  <li class="sidebar-list"><a class="sidebar-link sidebar-title active" href="#"><svg class="stroke-icon"><use href="{% static 'assets/svg/icon-sprite.svg#stroke-user' %}"></use></svg><span>Customers</span></a>
+                    <ul class="sidebar-submenu">
+                      <li><a href="{% url 'customer_register' %}" class="active">New Registration</a></li>
+                      <li><a href="{% url 'customer_list' %}">View All</a></li>
+                      <li><a href="{% url 'customer_search' %}">Search Customer</a></li>
+                    </ul>
+                  </li>
+                  <li class="sidebar-list"><a class="sidebar-link sidebar-title" href="#"><svg class="stroke-icon"><use href="{% static 'assets/svg/icon-sprite.svg#stroke-board' %}"></use></svg><span>Orders</span></a>
+                    <ul class="sidebar-submenu">
+                      <li><a href="{% url 'order_create' %}">Create Order</a></li>
+                      <li><a href="{% url 'order_list' %}">View All Orders</a></li>
+                      <li><a href="{% url 'order_tracking' %}">Track Orders</a></li>
+                    </ul>
+                  </li>
+                  <li class="sidebar-list"><a class="sidebar-link sidebar-title" href="#"><svg class="stroke-icon"><use href="{% static 'assets/svg/icon-sprite.svg#stroke-charts' %}"></use></svg><span>Analytics</span></a>
+                    <ul class="sidebar-submenu">
+                      <li><a href="{% url 'analytics_overview' %}">Overview</a></li>
+                      <li><a href="{% url 'analytics_performance' %}">Performance Metrics</a></li>
+                      <li><a href="{% url 'analytics_customer' %}">Customer Analytics</a></li>
+                      <li><a href="{% url 'analytics_service' %}">Service Analytics</a></li>
+                      <li><a href="{% url 'analytics_revenue' %}">Revenue Analysis</a></li>
+                    </ul>
+                  </li>
+                  <li class="sidebar-list"><a class="sidebar-link sidebar-title" href="#"><svg class="stroke-icon"><use href="{% static 'assets/svg/icon-sprite.svg#stroke-file' %}"></use></svg><span>Reports</span></a>
+                    <ul class="sidebar-submenu">
+                      <li><a href="{% url 'reports_daily' %}">Daily Reports</a></li>
+                      <li><a href="{% url 'reports_customer' %}">Customer Reports</a></li>
+                      <li><a href="{% url 'reports_service' %}">Service Reports</a></li>
+                      <li><a href="{% url 'reports_financial' %}">Financial Reports</a></li>
+                      <li><a href="{% url 'reports_custom' %}">Custom Reports</a></li>
+                    </ul>
+                  </li>
+                  <li class="sidebar-main-title"><div><h6 class="lan-1">System</h6></div></li>
+                  <li class="sidebar-list"><a class="sidebar-link sidebar-title" href="#"><svg class="stroke-icon"><use href="{% static 'assets/svg/icon-sprite.svg#stroke-setting' %}"></use></svg><span>Settings</span></a>
+                    <ul class="sidebar-submenu">
+                      <li><a href="{% url 'settings_general' %}">General Settings</a></li>
+                      <li><a href="{% url 'settings_services' %}">Service Configuration</a></li>
+                      <li><a href="{% url 'settings_users' %}">User Management</a></li>
+                      <li><a href="{% url 'settings_backup' %}">Backup & Restore</a></li>
+                    </ul>
+                  </li>
+                </ul>
+              </div>
+              <div class="right-arrow" id="right-arrow"><i data-feather="arrow-right"></i></div>
+            </nav>
+          </div>
+        </div>
+        <div class="page-body">
+          <div class="container-fluid">
+            <div class="page-title">
+              <div class="row">
+                <div class="col-sm-6 ps-0">
+                  <h3>New Customer Registration</h3>
+                  <div class="welcome-text mt-2"><p class="text-muted mb-0">Follow the steps to register a new customer</p></div>
+                </div>
+                <div class="col-sm-6 pe-0">
+                  <ol class="breadcrumb mt-2 justify-content-end">
+                    <li class="breadcrumb-item"><a href="{% url 'dashboard' %}"><svg class="stroke-icon"><use href="{% static 'assets/svg/icon-sprite.svg#stroke-home' %}"></use></svg></a></li>
+                    <li class="breadcrumb-item"><a href="#">Customers</a></li>
+                    <li class="breadcrumb-item active">New Registration</li>
+                  </ol>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="container-fluid">
+            <!-- Notification Area -->
+            <div id="notificationArea"></div>
+            
+            <div class="registration-container">
+              <div class="progress-bar-container"><div class="progress"><div class="progress-bar" role="progressbar" style="width: 25%;" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100" id="registrationProgressBar">Step 1 of 4</div></div></div>
+              <form id="registrationForm" novalidate>
+                <div id="step1" class="step-content active">
+                  <h4 class="step-title">Step 1: Basic Customer Information</h4>
+                  <div class="row">
+                    <div class="col-md-6 mb-3"><label for="fullName" class="form-label">Full Name</label><input type="text" class="form-control" id="fullName" required><div class="invalid-feedback">Please enter a full name.</div></div>
+                    <div class="col-md-6 mb-3"><label for="phoneNumber" class="form-label">Phone Number</label><input type="tel" class="form-control" id="phoneNumber" placeholder="+255 xxx xxx xxx" inputmode="tel" maxlength="20" required><div class="invalid-feedback">Please enter a valid phone number.</div></div>
+                  </div>
+                  <div class="row">
+                    <div class="col-md-6 mb-3"><label for="emailAddress" class="form-label">Email Address (Optional)</label><input type="email" class="form-control" id="emailAddress"></div>
+                    <div class="col-md-6 mb-3"><label for="address" class="form-label">Address (Optional)</label><textarea class="form-control" id="address" rows="1"></textarea></div>
+                  </div>
+                  <div class="row"><div class="col-12 mb-3"><label for="notes" class="form-label">Notes (Optional)</label><textarea class="form-control" id="notes" rows="3" placeholder="Additional customer information..."></textarea></div></div>
+                  <div class="step-buttons">
+                    <div class="d-flex flex-column gap-3 w-100">
+                      <div class="text-center">
+                        <p class="text-muted mb-3">What would you like to do after saving customer information?</p>
+                      </div>
+                      <div class="row g-3">
+                        <div class="col-md-6">
+                          <button type="button" class="btn btn-outline-primary w-100 py-3 action-choice-btn" id="saveCustomerOnly">
+                            <i data-feather="user-check" class="mb-2"></i>
+                            <div class="fw-bold">Save Customer Only</div>
+                            <small class="text-muted">Complete basic registration and finish</small>
+                          </button>
+                        </div>
+                        <div class="col-md-6">
+                          <button type="button" class="btn btn-primary w-100 py-3 action-choice-btn" id="continueWithOrder">
+                            <i data-feather="plus-circle" class="mb-2"></i>
+                            <div class="fw-bold">Continue with Order</div>
+                            <small class="text-muted">Add service details and create order</small>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div id="step2" class="step-content">
+                  <h4 class="step-title">Step 2: Service Intent</h4>
+                  <div class="row justify-content-center">
+                    <div class="col-md-5 mb-3"><div class="service-intent-card" data-intent="service"><i data-feather="tool"></i><h5>I need a service</h5><p>For car services or tire sales.</p></div></div>
+                    <div class="col-md-5 mb-3"><div class="service-intent-card" data-intent="inquiry"><i data-feather="help-circle"></i><h5>Just an inquiry</h5><p>For questions and consultations.</p></div></div>
+                  </div>
+                  <input type="hidden" id="serviceIntent" required>
+                  <div class="invalid-feedback" id="serviceIntentFeedback">Please select an intent.</div>
+                  <div class="step-buttons"><button type="button" class="btn btn-outline-secondary prev-btn" data-target="step1"><i data-feather="arrow-left" class="me-2"></i>Previous</button><button type="button" class="btn btn-primary" id="nextToStep3">Next <i data-feather="arrow-right" class="ms-2"></i></button></div>
+                </div>
+                <div id="step3" class="step-content">
+                  <h4 class="step-title">Step 3: Service Type</h4>
+                  <div class="row justify-content-center">
+                    <div class="col-md-5 mb-3"><div class="service-intent-card" data-service-type="tire-sales"><i data-feather="circle"></i><h5>Tire Sales</h5><p>Sales and wheel services.</p></div></div>
+                    <div class="col-md-5 mb-3"><div class="service-intent-card" data-service-type="car-service"><i data-feather="settings"></i><h5>Car Service</h5><p>Maintenance and repairs.</p></div></div>
+                  </div>
+                  <input type="hidden" id="serviceType" required>
+                  <div class="invalid-feedback" id="serviceTypeFeedback">Please select a service type.</div>
+                  <div class="step-buttons"><button type="button" class="btn btn-outline-secondary prev-btn" data-target="step2"><i data-feather="arrow-left" class="me-2"></i>Previous</button><button type="button" class="btn btn-primary" id="nextToStep4">Next <i data-feather="arrow-right" class="ms-2"></i></button></div>
+                </div>
+                <div id="step4" class="step-content">
+                  <h4 class="step-title">Step 4: Details & Review</h4>
+                  <div class="mb-3"><label for="customerType" class="form-label">Customer Type</label><select class="form-select" id="customerType" required><option value="">Select customer type...</option><option value="personal">Personal</option><option value="bodaboda">Bodaboda</option><option value="government">Government</option><option value="ngo">NGO</option><option value="company">Private Company</option></select><div class="invalid-feedback">Please select a customer type.</div></div>
+                  <div id="organizationFields"><div class="row"><div class="col-md-6 mb-3"><label for="organizationName" class="form-label">Organization Name</label><input type="text" class="form-control" id="organizationName"><div class="invalid-feedback">Organization name is required.</div></div><div class="col-md-6 mb-3"><label for="taxNumber" class="form-label">Tax Number</label><input type="text" class="form-control" id="taxNumber"><div class="invalid-feedback">Tax number is required.</div></div></div></div>
+                  <div id="personalFields"><label class="form-label">Sub-type</label><div class="d-flex gap-3"><div class="form-check"><input class="form-check-input" type="radio" name="personalSubType" id="owner" value="owner" checked><label class="form-check-label" for="owner">Owner</label></div><div class="form-check"><input class="form-check-input" type="radio" name="personalSubType" id="driver" value="driver"><label class="form-check-label" for="driver">Driver</label></div></div></div>
+                  <div class="step-buttons"><button type="button" class="btn btn-outline-secondary prev-btn" data-target="step2" id="prevFromStep4"><i data-feather="arrow-left" class="me-2"></i>Previous</button><button type="submit" class="btn btn-primary">Complete Registration</button></div>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+        <footer class="footer"><div class="container-fluid"><div class="row"><div class="col-md-12 footer-copyright text-center"><p class="mb-0">Copyright 2024 © Tracking System All rights reserved.</p></div></div></div></footer>
+      </div>
+    </div>
+    
+    <!-- Beautiful Popup Modal -->
+    <div class="popup-overlay" id="popupOverlay">
+      <div class="popup-card">
+        <div class="popup-icon" id="popupIcon">
+          <i id="popupIconSymbol"></i>
+        </div>
+        <h3 class="popup-title" id="popupTitle">Title</h3>
+        <p class="popup-message" id="popupMessage">Message content goes here</p>
+        <div class="popup-actions" id="popupActions">
+          <button class="popup-btn primary" id="popupPrimaryBtn">OK</button>
+        </div>
+      </div>
+    </div>
+    <script src="{% static 'assets/js/jquery.min.js' %}"></script>
+    <script src="{% static 'assets/js/bootstrap/bootstrap.bundle.min.js' %}"></script>
+    <script src="{% static 'assets/js/icons/feather-icon/feather.min.js' %}"></script>
+    <script src="{% static 'assets/js/icons/feather-icon/feather-icon.js' %}"></script>
+    <script src="{% static 'assets/js/scrollbar/simplebar.js' %}"></script>
+    <script src="{% static 'assets/js/scrollbar/custom.js' %}"></script>
+    <script src="{% static 'assets/js/config.js' %}"></script>
+    <script src="{% static 'assets/js/sidebar-menu.js' %}"></script>
+    <script src="{% static 'assets/js/sidebar-pin.js' %}"></script>
+    <script src="{% static 'assets/js/slick/slick.min.js' %}"></script>
+    <script src="{% static 'assets/js/slick/slick.js' %}"></script>
+    <script src="{% static 'assets/js/header-slick.js' %}"></script>
+    <script src="{% static 'assets/js/script.js' %}"></script>
+    <script src="{% static 'tracking-system.js' %}"></script>
+    <script src="{% static 'error-handling.js' %}"></script>
+    <script>
+      $(document).ready(function() {
+        $('#phoneNumber').on('input', function(){ this.value = this.value.replace(/[^+\d\s-]/g,''); });
+        let currentStep = 1; const totalSteps = 4;
+        function goToStep(step){$('.step-content').removeClass('active');$('#step'+step).addClass('active');const p=(step/totalSteps)*100;$('#registrationProgressBar').css('width',p+'%').text(`Step ${step} of ${totalSteps}`);currentStep=step;}
+        function validateStep(step){let ok=true; $(`#step${step} [required]`).each(function(){const f=$(this).siblings('.invalid-feedback'); if(!$(this).val()){ $(this).addClass('is-invalid'); if(f.length){f.text('Please fill out this field.').show();} ok=false;} else {$(this).removeClass('is-invalid'); if(f.length){f.hide();}}}); return ok;}
+        
+        // Beautiful Popup System
+        function showPopup(options) {
+          const {
+            type = 'success',
+            title = '',
+            message = '',
+            primaryText = 'OK',
+            secondaryText = '',
+            primaryAction = null,
+            secondaryAction = null,
+            autoClose = false
+          } = options;
+
+          // Set popup content
+          $('#popupTitle').text(title);
+          $('#popupMessage').text(message);
+          
+          // Set icon
+          const iconElement = $('#popupIcon');
+          const iconSymbol = $('#popupIconSymbol');
+          iconElement.removeClass('success error').addClass(type);
+          
+          if (type === 'success') {
+            iconSymbol.attr('data-feather', 'check-circle');
+          } else if (type === 'error') {
+            iconSymbol.attr('data-feather', 'x-circle');
+          }
+          
+          // Set actions
+          const actionsContainer = $('#popupActions');
+          actionsContainer.empty();
+          
+          const primaryBtn = $(`<button class="popup-btn primary">${primaryText}</button>`);
+          primaryBtn.on('click', function() {
+            hidePopup();
+            if (primaryAction) primaryAction();
+          });
+          actionsContainer.append(primaryBtn);
+          
+          if (secondaryText) {
+            const secondaryBtn = $(`<button class="popup-btn secondary">${secondaryText}</button>`);
+            secondaryBtn.on('click', function() {
+              hidePopup();
+              if (secondaryAction) secondaryAction();
+            });
+            actionsContainer.append(secondaryBtn);
+          }
+          
+          // Show popup
+          $('#popupOverlay').addClass('show');
+          
+          // Update feather icons
+          if (typeof feather !== 'undefined') feather.replace();
+          
+          // Auto close if requested
+          if (autoClose) {
+            setTimeout(hidePopup, 3000);
+          }
+        }
+
+        function hidePopup() {
+          $('#popupOverlay').removeClass('show');
+        }
+
+        // Enhanced user message function
+        function showUserMessage(message, type = 'success') {
+          let title = type === 'success' ? 'Success!' : 'Error!';
+          showPopup({
+            type: type,
+            title: title,
+            message: message,
+            autoClose: type === 'success'
+          });
+        }
+        // Handle "Save Customer Only" action
+        $('#saveCustomerOnly').on('click', function(){ 
+          if(validateStep(1)) {
+            saveBasicCustomer(false); // false means don't continue to order
+          }
+        });
+        
+        // Handle "Continue with Order" action  
+        $('#continueWithOrder').on('click', function(){ 
+          if(validateStep(1)) {
+            goToStep(2); // Continue to service steps
+          }
+        });
+        
+        // Function to save basic customer information with async handling
+        function saveBasicCustomer(continueToOrder = false) {
+          const basicData = {
+            name: $('#fullName').val(),
+            phone: $('#phoneNumber').val().replace(/\s+/g,''),
+            email: $('#emailAddress').val(),
+            address: $('#address').val(),
+            notes: $('#notes').val(),
+            customerType: 'personal', // Default for basic registration
+            personalSubType: 'owner' // Default for basic registration
+          };
+          
+          // Show loading state
+          const loadingBtn = continueToOrder ? $('#continueWithOrder') : $('#saveCustomerOnly');
+          const originalText = loadingBtn.html();
+          loadingBtn.prop('disabled', true).html('<i data-feather="loader" class="rotating"></i> Saving...');
+          
+          // Call the async createCustomer function
+          TrackingSystem.createCustomer(basicData)
+            .then(result => {
+              // Restore button state
+              loadingBtn.prop('disabled', false).html(originalText);
+              
+              if (result && result.success) {
+                const customerId = result.customer.id;
+                const customerName = result.customer.name;
+                
+                if (continueToOrder) {
+                  // Success popup with option to continue
+                  showPopup({
+                    type: 'success',
+                    title: 'Customer Registered!',
+                    message: `${customerName} has been successfully registered. Ready to create an order?`,
+                    primaryText: 'Create Order',
+                    secondaryText: 'Stay Here',
+                    primaryAction: function() {
+                      window.location.href = "{% url 'order_create' %}?customerId=" + encodeURIComponent(customerId);
+                    }
+                  });
+                } else {
+                  // Success popup with option to view customers or register another
+                  showPopup({
+                    type: 'success',
+                    title: 'Registration Complete!',
+                    message: `${customerName} has been successfully registered with ID: ${customerId}`,
+                    primaryText: 'View Customers',
+                    secondaryText: 'Register Another',
+                    primaryAction: function() {
+                      window.location.href = "{% url 'customer_list' %}";
+                    },
+                    secondaryAction: function() {
+                      // Reset form for new registration
+                      $('#registrationForm')[0].reset();
+                      $('.form-control, .form-select').removeClass('is-invalid');
+                      $('.invalid-feedback').hide();
+                    }
+                  });
+                }
+              } else {
+                // Error popup
+                showPopup({
+                  type: 'error',
+                  title: 'Registration Failed',
+                  message: result && result.error ? result.error : 'Failed to register customer. Please try again.',
+                  primaryText: 'Try Again'
+                });
+              }
+            })
+            .catch(error => {
+              // Restore button state
+              loadingBtn.prop('disabled', false).html(originalText);
+              
+              // Network error popup
+              showPopup({
+                type: 'error',
+                title: 'Connection Error',
+                message: 'Unable to save customer data. Please check your connection and try again.',
+                primaryText: 'Retry'
+              });
+            });
+        }
+        $('.service-intent-card[data-intent]').on('click', function(){ $('.service-intent-card[data-intent]').removeClass('selected'); $(this).addClass('selected'); $('#serviceIntent').val($(this).data('intent')).removeClass('is-invalid').siblings('.invalid-feedback').hide();});
+        $('#nextToStep3').on('click', function(){ const intent=$('#serviceIntent').val(); if(!intent){ $('#serviceIntentFeedback').text('Please select an intent.').show(); return;} if(intent==='service'){ $('#step3').show(); goToStep(3);} else { $('#step3').hide(); goToStep(4);} });
+        $('#step3 .service-intent-card[data-service-type]').on('click', function(){ $('#step3 .service-intent-card').removeClass('selected'); $(this).addClass('selected'); $('#serviceType').val($(this).data('service-type')).removeClass('is-invalid').siblings('.invalid-feedback').hide();});
+        $('#nextToStep4').on('click', function(){ if(!$('#serviceType').val()){ $('#serviceTypeFeedback').text('Please select a service type.').show(); return;} goToStep(4); });
+        $('.prev-btn').on('click', function(){ const t=$(this).data('target').replace('step',''); goToStep(parseInt(t));});
+        $('#customerType').on('change', function(){ const t=$(this).val(); const org=['government','ngo','company']; if(org.includes(t)){ $('#organizationFields').show(); $('#personalFields').hide(); $('#organizationName, #taxNumber').prop('required', true);} else if(t==='personal'){ $('#organizationFields').hide(); $('#personalFields').show(); $('#organizationName, #taxNumber').prop('required', false);} else { $('#organizationFields, #personalFields').hide(); $('#organizationName, #taxNumber').prop('required', false);} });
+        $('#registrationForm').on('submit', function(e){ 
+          e.preventDefault(); 
+          if(!validateStep(4)) return; 
+          
+          const type = $('#customerType').val(); 
+          const data = { 
+            name: $('#fullName').val(), 
+            phone: $('#phoneNumber').val().replace(/\s+/g,''), 
+            email: $('#emailAddress').val(), 
+            address: $('#address').val(), 
+            notes: $('#notes').val(), 
+            customerType: type, 
+            organizationName: (type==='company'||type==='government'||type==='ngo')? $('#organizationName').val() : '', 
+            taxNumber: (type==='company'||type==='government'||type==='ngo')? $('#taxNumber').val() : '', 
+            personalSubType: (type==='personal')? $('input[name="personalSubType"]:checked').val(): '',
+            serviceIntent: $('#serviceIntent').val(),
+            serviceType: $('#serviceType').val()
+          };
+          
+          // Show loading state
+          const submitBtn = $('button[type="submit"]');
+          const originalText = submitBtn.html();
+          submitBtn.prop('disabled', true).html('<i data-feather="loader" class="rotating"></i> Registering...');
+          
+          // Call the async createCustomer function
+          TrackingSystem.createCustomer(data)
+            .then(result => {
+              // Restore button state
+              submitBtn.prop('disabled', false).html(originalText);
+              
+              if (result && result.success) {
+                const customerId = result.customer.id;
+                const customerName = result.customer.name;
+                
+                // Success popup with comprehensive details
+                showPopup({
+                  type: 'success',
+                  title: 'Complete Registration Successful!',
+                  message: `${customerName} has been registered with all service details. Customer ID: ${customerId}`,
+                  primaryText: 'Create Order Now',
+                  secondaryText: 'Register Another',
+                  primaryAction: function() {
+                    window.location.href = "{% url 'order_create' %}?customerId=" + encodeURIComponent(customerId);
+                  },
+                  secondaryAction: function() {
+                    // Reset form for new registration
+                    $('#registrationForm')[0].reset();
+                    $('.form-control, .form-select').removeClass('is-invalid');
+                    $('.invalid-feedback').hide();
+                    $('.service-intent-card').removeClass('selected');
+                    $('#organizationFields, #personalFields').hide();
+                    goToStep(1);
+                  }
+                });
+              } else {
+                // Error popup
+                showPopup({
+                  type: 'error',
+                  title: 'Registration Failed',
+                  message: result && result.error ? result.error : 'Failed to register customer. Please review your information and try again.',
+                  primaryText: 'Try Again'
+                });
+              }
+            })
+            .catch(error => {
+              // Restore button state
+              submitBtn.prop('disabled', false).html(originalText);
+              
+              // Network error popup
+              showPopup({
+                type: 'error',
+                title: 'Connection Error',
+                message: 'Unable to save customer data. Please check your connection and try again.',
+                primaryText: 'Retry'
+              });
+            });
+        });
+        if (typeof feather!=='undefined') feather.replace();
+      });
+    </script>
+  </body>
+</html>

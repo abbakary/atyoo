@@ -1,0 +1,39 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tracking System - Customer Reports</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" type="text/css" href="{% static 'assets/css/vendors/bootstrap.css' %}">
+  <link rel="stylesheet" type="text/css" href="{% static 'assets/css/style.css' %}">
+  <link id="color" rel="stylesheet" href="{% static 'assets/css/color-1.css' %}" media="screen">
+  <link rel="stylesheet" type="text/css" href="{% static 'assets/css/responsive.css' %}">
+</head>
+<body>
+  <div class="page-wrapper compact-wrapper" id="pageWrapper">
+    <div class="page-header"><div class="header-wrapper row m-0"><div class="left-header col"><div class="d-flex align-items-center gap-2 "><h4 class="f-w-600">Customer Reports</h4></div></div></div></div>
+    <div class="page-body-wrapper"><div class="page-body"><div class="container-fluid">
+      <div class="card"><div class="card-header"><h5>Top Customers by Orders</h5></div>
+        <div class="card-body table-responsive">
+          <table class="table table-striped" id="custTable"><thead><tr><th>Customer</th><th>Total Orders</th><th>Last Visit</th></tr></thead><tbody></tbody></table>
+        </div>
+      </div>
+    </div></div>
+      <footer class="footer"><div class="container-fluid"><div class="row"><div class="col-md-12 footer-copyright text-center"><p class="mb-0">Copyright 2024 © Tracking System All rights reserved.</p></div></div></div></footer>
+    </div>
+  </div>
+  <script src="{% static 'assets/js/jquery.min.js' %}"></script>
+  <script src="{% static 'assets/js/bootstrap/bootstrap.bundle.min.js' %}"></script>
+  <script src="{% static 'tracking-system.js' %}"></script>
+  <script>
+    (function(){
+      const customers = TrackingSystem.getAllCustomers().slice();
+      customers.sort((a,b)=> (b.totalOrders||0)-(a.totalOrders||0));
+      const tb = document.querySelector('#custTable tbody');
+      customers.forEach(c=>{ const tr=document.createElement('tr'); tr.innerHTML = `<td>${c.name}</td><td>${c.totalOrders||0}</td><td>${c.lastVisit?new Date(c.lastVisit).toLocaleString():'Never'}</td>`; tb.appendChild(tr);});
+    })();
+  </script>
+</body>
+</html>

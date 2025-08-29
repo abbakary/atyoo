@@ -1,0 +1,54 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tracking System - Service Configuration</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" type="text/css" href="{% static 'assets/css/vendors/bootstrap.css' %}">
+  <link rel="stylesheet" type="text/css" href="{% static 'assets/css/style.css' %}">
+  <link id="color" rel="stylesheet" href="{% static 'assets/css/color-1.css' %}" media="screen">
+  <link rel="stylesheet" type="text/css" href="{% static 'assets/css/responsive.css' %}">
+</head>
+<body>
+  <div class="page-wrapper compact-wrapper" id="pageWrapper">
+    <div class="page-header"><div class="header-wrapper row m-0"><div class="left-header col"><div class="d-flex align-items-center gap-2 "><h4 class="f-w-600">Service Configuration</h4></div></div></div></div>
+    <div class="page-body-wrapper"><div class="page-body"><div class="container-fluid">
+      <div class="card"><div class="card-header d-flex justify-content-between align-items-center"><h5>Services</h5><button class="btn btn-primary btn-sm" id="addService">Add Service</button></div>
+        <div class="card-body">
+          <div id="servicesList" class="row g-3"></div>
+        </div>
+      </div>
+    </div></div>
+      <footer class="footer"><div class="container-fluid"><div class="row"><div class="col-md-12 footer-copyright text-center"><p class="mb-0">Copyright 2024 © Tracking System All rights reserved.</p></div></div></div></footer>
+    </div>
+  </div>
+  <script src="{% static 'assets/js/jquery.min.js' %}"></script>
+  <script src="{% static 'assets/js/bootstrap/bootstrap.bundle.min.js' %}"></script>
+  <script>
+    (function(){
+      const key='trackingSystem_services';
+      const list = document.getElementById('servicesList');
+      function load(){
+        const s = JSON.parse(localStorage.getItem(key)||'[]');
+        list.innerHTML = '';
+        s.forEach((svc,idx)=>{
+          const col = document.createElement('div');
+          col.className = 'col-xl-4';
+          col.innerHTML = `<div class='card'><div class='card-body'><div class='d-flex justify-content-between align-items-start'><h6>${svc.name}</h6><button class='btn btn-sm btn-outline-danger' data-idx='${idx}'>Remove</button></div><small class='text-muted d-block'>Type: ${svc.type}</small><small class='text-muted'>Base Price: $${svc.basePrice}</small></div></div>`;
+          list.appendChild(col);
+        });
+      }
+      load();
+      document.getElementById('addService').addEventListener('click', function(){
+        const name = prompt('Service name'); if(!name) return;
+        const type = prompt('Type (car-service / tire-sales / consultation)','car-service'); if(!type) return;
+        const base = parseFloat(prompt('Base price','50')||'50');
+        const cur = JSON.parse(localStorage.getItem(key)||'[]'); cur.push({name,type,basePrice:base}); localStorage.setItem(key, JSON.stringify(cur)); load();
+      });
+      list.addEventListener('click', function(e){ const btn=e.target.closest('button[data-idx]'); if(!btn) return; const idx=parseInt(btn.getAttribute('data-idx')); const cur=JSON.parse(localStorage.getItem(key)||'[]'); cur.splice(idx,1); localStorage.setItem(key, JSON.stringify(cur)); load(); });
+    })();
+  </script>
+</body>
+</html>

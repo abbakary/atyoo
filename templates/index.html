@@ -1,0 +1,541 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Customer & Order Tracking System">
+    <meta name="keywords" content="tracking, customer management, order management">
+    <meta name="author" content="Tracking App">
+    <link rel="icon" href="{% static 'assets/images/favicon.png' %}" type="image/x-icon">
+    <link rel="shortcut icon" href="{% static 'assets/images/favicon.png' %}" type="image/x-icon">
+    <title>Tracking System - Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="{% static 'assets/css/font-awesome.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'assets/css/vendors/icofont.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'assets/css/vendors/themify.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'assets/css/vendors/flag-icon.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'assets/css/vendors/feather-icon.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'assets/css/vendors/slick.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'assets/css/vendors/slick-theme.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'assets/css/vendors/scrollbar.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'assets/css/vendors/animate.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'assets/css/vendors/bootstrap.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'assets/css/style.css' %}">
+    <link id="color" rel="stylesheet" href="{% static 'assets/css/color-1.css' %}" media="screen">
+    <link rel="stylesheet" type="text/css" href="{% static 'assets/css/responsive.css' %}">
+    <style>
+      .dashboard-header{background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:#fff;border-radius:15px;padding:30px;margin-bottom:30px;position:relative;overflow:hidden}
+      .dashboard-header::before{content:'';position:absolute;top:-50%;right:-50%;width:200%;height:200%;background:radial-gradient(circle,rgba(255,255,255,0.1) 0%,transparent 70%);animation:float 20s infinite linear}
+      @keyframes float{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
+      .stat-card{background:#fff;border-radius:15px;padding:25px 20px;transition:all .3s ease;border:1px solid #e9ecef;box-shadow:0 2px 8px rgba(0,0,0,.08);position:relative;overflow:hidden;margin-bottom:20px}
+      .stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--stat-color,#007bff),var(--stat-color-light,#66b3ff))}
+      .stat-card:hover{transform:translateY(-5px);box-shadow:0 8px 25px rgba(0,0,0,.15)}
+      .stat-card.pending{--stat-color:#ffc107;--stat-color-light:#ffed4e}
+      .stat-card.in-progress{--stat-color:#17a2b8;--stat-color-light:#5bc0de}
+      .stat-card.completed{--stat-color:#28a745;--stat-color-light:#5cb85c}
+      .stat-card.total{--stat-color:#6c757d;--stat-color-light:#adb5bd}
+      .stat-number{font-size:2.5em;font-weight:700;margin:0;color:var(--stat-color,#007bff);line-height:1}
+      .stat-label{color:#6c757d;font-weight:600;text-transform:uppercase;font-size:.9em;letter-spacing:.5px;margin-bottom:10px}
+      .quick-stats{background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);border-radius:15px;padding:25px;color:#fff;margin-bottom:30px}
+      .quick-stat-item{text-align:center;padding:15px}
+      .quick-stat-number{font-size:2em;font-weight:700;margin-bottom:5px}
+      .activity-card{background:#fff;border-radius:15px;padding:20px;margin-bottom:20px;box-shadow:0 2px 8px rgba(0,0,0,.08);border:1px solid #e9ecef}
+      .activity-header{margin-bottom:15px}
+      .section-title{color:#333;font-weight:600;margin-bottom:5px}
+      .section-subtitle{color:#6c757d;font-size:.9em;margin:0}
+      .metric-card{text-align:center;padding:15px;background:#f8f9fa;border-radius:10px;margin-bottom:10px}
+      .real-time-indicator{display:flex;align-items:center;gap:8px}
+      .real-time-dot{width:8px;height:8px;background:#28a745;border-radius:50%;animation:pulse 2s infinite}
+      @keyframes pulse{0%{opacity:1}50%{opacity:0.5}100%{opacity:1}}
+      .dashboard-actions .btn{margin-left:8px}
+      @media (max-width:768px){.dashboard-actions{flex-direction:column;gap:10px !important}.dashboard-actions .btn{width:100%;margin-left:0;margin-bottom:8px}.stat-card{margin-bottom:20px}.stat-number{font-size:2em}.quick-stat-number{font-size:1.5em}}
+    </style>
+  </head>
+  <body>
+    <div class="loader-wrapper"><div class="loader"><div class="loader4"></div></div></div>
+    <div class="tap-top"><i data-feather="chevrons-up"></i></div>
+    <div class="page-wrapper compact-wrapper" id="pageWrapper">
+      <div class="page-header">
+        <div class="header-wrapper row m-0">
+          <form class="form-inline search-full col" action="#" method="get">
+            <div class="form-group w-100">
+              <div class="Typeahead Typeahead--twitterUsers">
+                <div class="u-posRelative">
+                  <input class="demo-input Typeahead-input form-control-plaintext w-100" type="text" placeholder="Search customers, orders..." name="q" autofocus>
+                  <div class="spinner-border Typeahead-spinner" role="status"><span class="sr-only">Loading...</span></div>
+                  <i class="close-search" data-feather="x"></i>
+                </div>
+                <div class="Typeahead-menu"></div>
+              </div>
+            </div>
+          </form>
+          <div class="header-logo-wrapper col-auto p-0">
+            <div class="logo-wrapper">
+              <a href="{% url 'dashboard' %}">
+                <img class="img-fluid for-light" src="{% static 'assets/images/logo/logo_dark.png' %}" alt="">
+                <img class="img-fluid for-dark" src="{% static 'assets/images/logo/logo.png' %}" alt="">
+              </a>
+            </div>
+            <div class="toggle-sidebar"><i class="status_toggle middle sidebar-toggle" data-feather="align-center"></i></div>
+          </div>
+          <div class="left-header col-xxl-5 col-xl-6 col-lg-5 col-md-4 col-sm-3 p-0">
+            <div>
+              <a class="toggle-sidebar" href="#"><i class="iconly-Category icli"></i></a>
+              <div class="d-flex align-items-center gap-2">
+                <h4 class="f-w-600">Welcome Manager</h4>
+                <img class="mt-0" src="{% static 'assets/images/hand.gif' %}" alt="hand-gif">
+              </div>
+            </div>
+            <div class="welcome-content d-xl-block d-none">
+              <span class="text-truncate col-12">Track your business operations today.</span>
+            </div>
+          </div>
+          <div class="nav-right col-xxl-7 col-xl-6 col-md-7 col-8 pull-right right-header p-0 ms-auto">
+            <ul class="nav-menus">
+              <li class="d-md-block d-none">
+                <div class="form search-form mb-0">
+                  <div class="input-group">
+                    <span class="input-icon">
+                      <svg><use href="{% static 'assets/svg/icon-sprite.svg#search-header' %}"></use></svg>
+                      <input class="w-100" type="search" placeholder="Search customers, orders..." id="headerSearch">
+                    </span>
+                  </div>
+                </div>
+              </li>
+              <li><div class="mode"><i class="moon" data-feather="moon"></i></div></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      
+      <div class="page-body-wrapper">
+        <div class="sidebar-wrapper" sidebar-layout="stroke-svg">
+          <div>
+            <div class="logo-wrapper">
+              <a href="{% url 'dashboard' %}"><img class="img-fluid" src="{% static 'assets/images/logo/logo.png' %}" alt=""></a>
+              <div class="toggle-sidebar"><i class="status_toggle middle sidebar-toggle" data-feather="grid"></i></div>
+            </div>
+            <div class="logo-icon-wrapper">
+              <a href="{% url 'dashboard' %}"><img class="img-fluid" src="{% static 'assets/images/logo/logo-icon.png' %}" alt=""></a>
+            </div>
+            <nav class="sidebar-main">
+              <div class="left-arrow" id="left-arrow"><i data-feather="arrow-left"></i></div>
+              <div id="sidebar-menu">
+                <ul class="sidebar-links" id="simple-bar">
+                  <li class="back-btn">
+                    <a href="{% url 'dashboard' %}"><img class="img-fluid" src="{% static 'assets/images/logo/logo-icon.png' %}" alt=""></a>
+                    <div class="mobile-back text-end"><span>Back</span><i class="fa fa-angle-right ps-2" aria-hidden="true"></i></div>
+                  </li>
+                  <li class="pin-title sidebar-main-title"><div><h6>Tracking System</h6></div></li>
+                  <li class="sidebar-main-title"><div><h6 class="lan-1">Main Menu</h6></div></li>
+                  <li class="sidebar-list">
+                    <a class="sidebar-link sidebar-title link-nav active" href="{% url 'dashboard' %}">
+                      <svg class="stroke-icon"><use href="{% static 'assets/svg/icon-sprite.svg#stroke-home' %}"></use></svg>
+                      <span>Dashboard</span>
+                    </a>
+                  </li>
+                  <li class="sidebar-list">
+                    <a class="sidebar-link sidebar-title" href="#">
+                      <svg class="stroke-icon"><use href="{% static 'assets/svg/icon-sprite.svg#stroke-user' %}"></use></svg>
+                      <span>Customers</span>
+                    </a>
+                    <ul class="sidebar-submenu">
+                      <li><a href="{% url 'customer_register' %}">New Registration</a></li>
+                      <li><a href="{% url 'customer_list' %}">View All</a></li>
+                      <li><a href="{% url 'customer_manage' %}">Manage Customers</a></li>
+                      <li><a href="{% url 'customer_search' %}">Search Customer</a></li>
+                    </ul>
+                  </li>
+                  <li class="sidebar-list">
+                    <a class="sidebar-link sidebar-title" href="#">
+                      <svg class="stroke-icon"><use href="{% static 'assets/svg/icon-sprite.svg#stroke-board' %}"></use></svg>
+                      <span>Orders</span>
+                    </a>
+                    <ul class="sidebar-submenu">
+                      <li><a href="{% url 'order_create' %}">Create Order</a></li>
+                      <li><a href="{% url 'order_list' %}">View All Orders</a></li>
+                      <li><a href="{% url 'order_tracking' %}">Track Orders</a></li>
+                    </ul>
+                  </li>
+                  <li class="sidebar-list">
+                    <a class="sidebar-link sidebar-title" href="#">
+                      <svg class="stroke-icon"><use href="{% static 'assets/svg/icon-sprite.svg#stroke-charts' %}"></use></svg>
+                      <span>Analytics</span>
+                    </a>
+                    <ul class="sidebar-submenu">
+                      <li><a href="{% url 'analytics_overview' %}">Overview</a></li>
+                      <li><a href="{% url 'analytics_performance' %}">Performance Metrics</a></li>
+                      <li><a href="{% url 'analytics_customer' %}">Customer Analytics</a></li>
+                      <li><a href="{% url 'analytics_service' %}">Service Analytics</a></li>
+                      <li><a href="{% url 'analytics_revenue' %}">Revenue Analysis</a></li>
+                    </ul>
+                  </li>
+                  <li class="sidebar-list">
+                    <a class="sidebar-link sidebar-title" href="#">
+                      <svg class="stroke-icon"><use href="{% static 'assets/svg/icon-sprite.svg#stroke-file' %}"></use></svg>
+                      <span>Reports</span>
+                    </a>
+                    <ul class="sidebar-submenu">
+                      <li><a href="{% url 'reports_daily' %}">Daily Reports</a></li>
+                      <li><a href="{% url 'reports_customer' %}">Customer Reports</a></li>
+                      <li><a href="{% url 'reports_service' %}">Service Reports</a></li>
+                      <li><a href="{% url 'reports_financial' %}">Financial Reports</a></li>
+                      <li><a href="{% url 'reports_custom' %}">Custom Reports</a></li>
+                    </ul>
+                  </li>
+                  <li class="sidebar-main-title"><div><h6 class="lan-1">System</h6></div></li>
+                  <li class="sidebar-list">
+                    <a class="sidebar-link sidebar-title" href="#">
+                      <svg class="stroke-icon"><use href="{% static 'assets/svg/icon-sprite.svg#stroke-setting' %}"></use></svg>
+                      <span>Settings</span>
+                    </a>
+                    <ul class="sidebar-submenu">
+                      <li><a href="{% url 'settings_general' %}">General Settings</a></li>
+                      <li><a href="{% url 'settings_services' %}">Service Configuration</a></li>
+                      <li><a href="{% url 'settings_users' %}">User Management</a></li>
+                      <li><a href="{% url 'settings_backup' %}">Backup & Restore</a></li>
+                    </ul>
+                  </li>
+                </ul>
+              </div>
+              <div class="right-arrow" id="right-arrow"><i data-feather="arrow-right"></i></div>
+            </nav>
+          </div>
+        </div>
+        
+        <div class="page-body">
+          <div class="container-fluid">
+            <div class="page-title">
+              <div class="row">
+                <div class="col-sm-6 ps-0">
+                  <h3>Dashboard Overview</h3>
+                  <div class="welcome-text mt-2">
+                    <p class="text-muted mb-0">Monitor your business operations in real-time</p>
+                  </div>
+                </div>
+                <div class="col-sm-6 pe-0">
+                  <div class="d-flex align-items-center justify-content-end gap-3">
+                    <div class="dashboard-actions">
+                      <a href="{% url 'customer_register' %}" class="btn btn-primary btn-sm">
+                        <i data-feather="user-plus" class="me-1"></i>New Customer
+                      </a>
+                      <a href="{% url 'order_create' %}" class="btn btn-success btn-sm">
+                        <i data-feather="plus-circle" class="me-1"></i>Create Order
+                      </a>
+                    </div>
+                  </div>
+                  <ol class="breadcrumb mt-2">
+                    <li class="breadcrumb-item">
+                      <a href="{% url 'dashboard' %}">
+                        <svg class="stroke-icon"><use href="{% static 'assets/svg/icon-sprite.svg#stroke-home' %}"></use></svg>
+                      </a>
+                    </li>
+                    <li class="breadcrumb-item active">Dashboard</li>
+                  </ol>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="container-fluid">
+            <!-- Live Stats Section -->
+            <div class="quick-stats">
+              <div class="row">
+                <div class="col-md-8">
+                  <h4 class="mb-3">
+                    <span class="real-time-indicator">
+                      <span class="real-time-dot"></span>Live Dashboard
+                    </span>
+                  </h4>
+                  <div class="row">
+                    <div class="col-md-3 col-6">
+                      <div class="quick-stat-item">
+                        <div class="quick-stat-number" id="liveCustomersToday">0</div>
+                        <div class="quick-stat-label">Today's Arrivals</div>
+                      </div>
+                    </div>
+                    <div class="col-md-3 col-6">
+                      <div class="quick-stat-item">
+                        <div class="quick-stat-number" id="liveActiveOrders">0</div>
+                        <div class="quick-stat-label">Currently Active</div>
+                      </div>
+                    </div>
+                    <div class="col-md-3 col-6">
+                      <div class="quick-stat-item">
+                        <div class="quick-stat-number" id="liveCompletedToday">0</div>
+                        <div class="quick-stat-label">Completed Today</div>
+                      </div>
+                    </div>
+                    <div class="col-md-3 col-6">
+                      <div class="quick-stat-item">
+                        <div class="quick-stat-number" id="liveAvgWaitTime">0m</div>
+                        <div class="quick-stat-label">Avg Wait Time</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="text-end">
+                    <h6 class="mb-3">Service Efficiency</h6>
+                    <div class="row">
+                      <div class="col-6">
+                        <div class="quick-stat-item">
+                          <div class="quick-stat-number" id="efficiencyRate">0%</div>
+                          <div class="quick-stat-label">Efficiency</div>
+                        </div>
+                      </div>
+                      <div class="col-6">
+                        <div class="quick-stat-item">
+                          <div class="quick-stat-number" id="totalRevenue">0</div>
+                          <div class="quick-stat-label">Revenue</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Main Statistics Cards -->
+            <div class="row">
+              <div class="col-xl-3 col-lg-6 col-md-6 col-sm-12">
+                <div class="stat-card total">
+                  <div class="stat-label">Total Customers</div>
+                  <div class="stat-number" id="totalCustomers">0</div>
+                  <div class="stat-trend">
+                    <i data-feather="trending-up" class="trend-up"></i>
+                    <span class="trend-up">+<span id="customerGrowth">0</span>% this month</span>
+                  </div>
+                </div>
+              </div>
+              <div class="col-xl-3 col-lg-6 col-md-6 col-sm-12">
+                <div class="stat-card pending">
+                  <div class="stat-label">Pending Orders</div>
+                  <div class="stat-number" id="pendingOrders">0</div>
+                  <div class="stat-trend">
+                    <i data-feather="clock" class="trend-neutral"></i>
+                    <span class="trend-neutral">Awaiting service</span>
+                  </div>
+                </div>
+              </div>
+              <div class="col-xl-3 col-lg-6 col-md-6 col-sm-12">
+                <div class="stat-card in-progress">
+                  <div class="stat-label">In Progress</div>
+                  <div class="stat-number" id="inProgress">0</div>
+                  <div class="stat-trend">
+                    <i data-feather="activity" class="trend-neutral"></i>
+                    <span class="trend-neutral">Currently servicing</span>
+                  </div>
+                </div>
+              </div>
+              <div class="col-xl-3 col-lg-6 col-md-6 col-sm-12">
+                <div class="stat-card completed">
+                  <div class="stat-label">Completed Today</div>
+                  <div class="stat-number" id="completedToday">0</div>
+                  <div class="stat-trend">
+                    <i data-feather="check-circle" class="trend-up"></i>
+                    <span class="trend-up">Great progress!</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Service Breakdown and Recent Activity -->
+            <div class="row">
+              <div class="col-md-4">
+                <div class="activity-card">
+                  <div class="activity-header">
+                    <div class="section-header">
+                      <h5 class="section-title">Service Breakdown</h5>
+                      <p class="section-subtitle">Current service type distribution</p>
+                    </div>
+                  </div>
+                  <div class="card-body">
+                    <div class="row">
+                      <div class="col-6">
+                        <div class="metric-card">
+                          <h4 class="text-primary" id="carServiceCount">0</h4>
+                          <p class="mb-0">Car Service</p>
+                        </div>
+                      </div>
+                      <div class="col-6">
+                        <div class="metric-card">
+                          <h4 class="text-success" id="tireSalesCount">0</h4>
+                          <p class="mb-0">Tire Sales</p>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="row mt-3">
+                      <div class="col-6">
+                        <div class="metric-card">
+                          <h4 class="text-warning" id="consultationCount">0</h4>
+                          <p class="mb-0">Consultation</p>
+                        </div>
+                      </div>
+                      <div class="col-6">
+                        <div class="metric-card">
+                          <h4 class="text-info" id="readyForDeparture">0</h4>
+                          <p class="mb-0">Ready to Leave</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-8">
+                <div class="activity-card">
+                  <div class="activity-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                      <div class="section-header">
+                        <h5 class="section-title">Recent Activity</h5>
+                        <p class="section-subtitle">Latest customer arrivals and order updates</p>
+                      </div>
+                      <div>
+                        <button class="btn btn-outline-primary btn-sm" onclick="refreshRecentActivity()">
+                          <i data-feather="refresh-cw" class="me-1"></i>Refresh
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="card-body p-0">
+                    <div id="recentActivityList">
+                      <div class="activity-item">
+                        <div class="d-flex justify-content-between align-items-center">
+                          <div>
+                            <h6 class="mb-1">No recent activity</h6>
+                            <p class="mb-0 text-muted">Activity will appear here as customers arrive and orders are processed</p>
+                          </div>
+                          <div class="text-muted">
+                            <small>System ready</small>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Charts Section -->
+            <div class="row">
+              <div class="col-xl-8 col-md-12">
+                <div class="card">
+                  <div class="card-header pb-0">
+                    <div class="d-flex justify-content-between">
+                      <h4>Daily Orders Overview</h4>
+                      <div class="dropdown">
+                        <button class="btn btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown">Last 7 Days</button>
+                        <ul class="dropdown-menu">
+                          <li><a class="dropdown-item" href="#">Last 7 Days</a></li>
+                          <li><a class="dropdown-item" href="#">Last 30 Days</a></li>
+                          <li><a class="dropdown-item" href="#">Last 3 Months</a></li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="card-body">
+                    <div id="dailyOrdersChart"></div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-xl-4 col-md-12">
+                <div class="card">
+                  <div class="card-header pb-0">
+                    <h4>Order Status Distribution</h4>
+                  </div>
+                  <div class="card-body">
+                    <div id="orderStatusChart"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-xl-6 col-md-12">
+                <div class="card">
+                  <div class="card-header pb-0">
+                    <h4>Service Types Performance</h4>
+                  </div>
+                  <div class="card-body">
+                    <div id="serviceTypesChart"></div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-xl-6 col-md-12">
+                <div class="card">
+                  <div class="card-header pb-0">
+                    <h4>Average Service Duration</h4>
+                  </div>
+                  <div class="card-body">
+                    <div id="averageDurationChart"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Recent Activities and Departures -->
+            <div class="row">
+              <div class="col-xl-6 col-md-12">
+                <div class="card">
+                  <div class="card-header pb-0">
+                    <h4>Recent Customer Arrivals</h4>
+                  </div>
+                  <div class="card-body">
+                    <div class="activity-timeline" id="recentArrivals"></div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-xl-6 col-md-12">
+                <div class="card">
+                  <div class="card-header pb-0">
+                    <h4>Pending Departures</h4>
+                  </div>
+                  <div class="card-body">
+                    <div class="activity-timeline" id="pendingDepartures"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <footer class="footer">
+            <div class="container-fluid">
+              <div class="row">
+                <div class="col-md-12 footer-copyright text-center">
+                  <p class="mb-0">Copyright 2024 © Tracking System All rights reserved.</p>
+                </div>
+              </div>
+            </div>
+          </footer>
+        </div>
+      </div>
+    </div>
+
+    <script src="{% static 'assets/js/jquery.min.js' %}"></script>
+    <script src="{% static 'assets/js/bootstrap/bootstrap.bundle.min.js' %}"></script>
+    <script src="{% static 'assets/js/icons/feather-icon/feather.min.js' %}"></script>
+    <script src="{% static 'assets/js/icons/feather-icon/feather-icon.js' %}"></script>
+    <script src="{% static 'assets/js/scrollbar/simplebar.js' %}"></script>
+    <script src="{% static 'assets/js/scrollbar/custom.js' %}"></script>
+    <script src="{% static 'assets/js/config.js' %}"></script>
+    <script src="{% static 'assets/js/sidebar-menu.js' %}"></script>
+    <script src="{% static 'assets/js/sidebar-pin.js' %}"></script>
+    <script src="{% static 'assets/js/slick/slick.min.js' %}"></script>
+    <script src="{% static 'assets/js/slick/slick.js' %}"></script>
+    <script src="{% static 'assets/js/header-slick.js' %}"></script>
+    <script src="{% static 'assets/js/chart/apex-chart/apex-chart.js' %}"></script>
+    <script src="{% static 'assets/js/chart/apex-chart/stock-prices.js' %}"></script>
+    <script src="{% static 'assets/js/chart/apex-chart/moment.min.js' %}"></script>
+    <script src="{% static 'assets/js/counter/jquery.waypoints.min.js' %}"></script>
+    <script src="{% static 'assets/js/counter/jquery.counterup.min.js' %}"></script>
+    <script src="{% static 'assets/js/counter/counter-custom.js' %}"></script>
+    <script src="{% static 'assets/js/script.js' %}"></script>
+    <script src="{% static 'tracking-system.js' %}"></script>
+    <script src="{% static 'tracking-dashboard.js' %}"></script>
+    <script>$(function(){ if(window.TrackingDashboard){TrackingDashboard.init();} });</script>
+  </body>
+</html>

@@ -1,0 +1,52 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tracking System - Backup & Restore</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" type="text/css" href="{% static 'assets/css/vendors/bootstrap.css' %}">
+  <link rel="stylesheet" type="text/css" href="{% static 'assets/css/style.css' %}">
+  <link id="color" rel="stylesheet" href="{% static 'assets/css/color-1.css' %}" media="screen">
+  <link rel="stylesheet" type="text/css" href="{% static 'assets/css/responsive.css' %}">
+</head>
+<body>
+  <div class="page-wrapper compact-wrapper" id="pageWrapper">
+    <div class="page-header"><div class="header-wrapper row m-0"><div class="left-header col"><div class="d-flex align-items-center gap-2 "><h4 class="f-w-600">Backup & Restore</h4></div></div></div></div>
+    <div class="page-body-wrapper"><div class="page-body"><div class="container-fluid">
+      <div class="card"><div class="card-header"><h5>Local Backup</h5></div>
+        <div class="card-body">
+          <div class="d-flex gap-2">
+            <button class="btn btn-primary" id="backupBtn">Download Backup</button>
+            <label class="btn btn-outline-secondary mb-0"><input type="file" id="restoreInput" accept="application/json" hidden>Restore From File</label>
+          </div>
+        </div>
+      </div>
+    </div></div>
+      <footer class="footer"><div class="container-fluid"><div class="row"><div class="col-md-12 footer-copyright text-center"><p class="mb-0">Copyright 2024 © Tracking System All rights reserved.</p></div></div></div></footer>
+    </div>
+  </div>
+  <script src="{% static 'assets/js/jquery.min.js' %}"></script>
+  <script src="{% static 'assets/js/bootstrap/bootstrap.bundle.min.js' %}"></script>
+  <script>
+    (function(){
+      document.getElementById('backupBtn').addEventListener('click', function(){
+        const data = {
+          customers: localStorage.getItem('trackingSystem_customers')||'[]',
+          orders: localStorage.getItem('trackingSystem_orders')||'[]',
+          services: localStorage.getItem('trackingSystem_services')||'[]',
+          settings: localStorage.getItem('trackingSystem_settings')||'{}'
+        };
+        const blob = new Blob([JSON.stringify(data,null,2)], {type:'application/json'});
+        const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='tracking-backup.json'; a.click();
+      });
+      document.getElementById('restoreInput').addEventListener('change', function(){
+        const file=this.files[0]; if(!file) return; const r=new FileReader();
+        r.onload=function(){ try{ const data=JSON.parse(r.result); if(data.customers) localStorage.setItem('trackingSystem_customers', data.customers); if(data.orders) localStorage.setItem('trackingSystem_orders', data.orders); if(data.services) localStorage.setItem('trackingSystem_services', data.services); if(data.settings) localStorage.setItem('trackingSystem_settings', data.settings); alert('Restore complete'); }catch(e){ alert('Invalid backup file'); }};
+        r.readAsText(file);
+      });
+    })();
+  </script>
+</body>
+</html>

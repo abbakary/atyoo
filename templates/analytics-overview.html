@@ -1,0 +1,102 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Analytics Overview">
+  <link rel="icon" href="{% static 'assets/images/favicon.png' %}" type="image/x-icon">
+  <title>Tracking System - Analytics Overview</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" type="text/css" href="{% static 'assets/css/font-awesome.css' %}">
+  <link rel="stylesheet" type="text/css" href="{% static 'assets/css/vendors/icofont.css' %}">
+  <link rel="stylesheet" type="text/css" href="{% static 'assets/css/vendors/themify.css' %}">
+  <link rel="stylesheet" type="text/css" href="{% static 'assets/css/vendors/feather-icon.css' %}">
+  <link rel="stylesheet" type="text/css" href="{% static 'assets/css/vendors/bootstrap.css' %}">
+  <link rel="stylesheet" type="text/css" href="{% static 'assets/css/style.css' %}">
+  <link id="color" rel="stylesheet" href="{% static 'assets/css/color-1.css' %}" media="screen">
+  <link rel="stylesheet" type="text/css" href="{% static 'assets/css/responsive.css' %}">
+</head>
+<body>
+  <div class="page-wrapper compact-wrapper" id="pageWrapper">
+    <div class="page-header">
+      <div class="header-wrapper row m-0">
+        <div class="header-logo-wrapper col-auto p-0">
+          <div class="logo-wrapper">
+            <a href="{% url 'dashboard' %}"><img class="img-fluid for-light" src="{% static 'assets/images/logo/logo_dark.png' %}" alt=""><img class="img-fluid for-dark" src="{% static 'assets/images/logo/logo.png' %}" alt=""></a>
+          </div>
+          <div class="toggle-sidebar"><i class="status_toggle middle sidebar-toggle" data-feather="align-center"></i></div>
+        </div>
+        <div class="left-header col"><div class="d-flex align-items-center gap-2 "><h4 class="f-w-600">Analytics Overview</h4></div></div>
+      </div>
+    </div>
+    <div class="page-body-wrapper">
+      <div class="sidebar-wrapper" sidebar-layout="stroke-svg">
+        <div>
+          <div class="logo-wrapper"><a href="{% url 'dashboard' %}"><img class="img-fluid" src="{% static 'assets/images/logo/logo.png' %}" alt=""></a><div class="toggle-sidebar"><i class="status_toggle middle sidebar-toggle" data-feather="grid"></i></div></div>
+          <div class="logo-icon-wrapper"><a href="{% url 'dashboard' %}"><img class="img-fluid" src="{% static 'assets/images/logo/logo-icon.png' %}" alt=""></a></div>
+          <nav class="sidebar-main">
+            <div id="sidebar-menu">
+              <ul class="sidebar-links" id="simple-bar">
+                <li class="sidebar-list"><a class="sidebar-link sidebar-title link-nav" href="{% url 'dashboard' %}"><svg class="stroke-icon"><use href="{% static 'assets/svg/icon-sprite.svg' %}#stroke-home"></use></svg><span>Dashboard</span></a></li>
+                <li class="sidebar-list"><a class="sidebar-link sidebar-title active" href="#"><svg class="stroke-icon"><use href="{% static 'assets/svg/icon-sprite.svg' %}#stroke-charts"></use></svg><span>Analytics</span></a>
+                  <ul class="sidebar-submenu">
+                    <li><a href="{% url 'analytics_overview' %}" class="active">Overview</a></li>
+                    <li><a href="{% url 'analytics_performance' %}">Performance Metrics</a></li>
+                    <li><a href="{% url 'analytics_customer' %}">Customer Analytics</a></li>
+                    <li><a href="{% url 'analytics_service' %}">Service Analytics</a></li>
+                    <li><a href="{% url 'analytics_revenue' %}">Revenue Analysis</a></li>
+                  </ul>
+                </li>
+              </ul>
+            </div>
+          </nav>
+        </div>
+      </div>
+      <div class="page-body">
+        <div class="container-fluid">
+          <div class="row g-3">
+            <div class="col-sm-6 col-xl-3"><div class="card"><div class="card-body"><small class="text-muted">Total Orders</small><h3 id="kpiTotalOrders" class="mb-0">0</h3></div></div></div>
+            <div class="col-sm-6 col-xl-3"><div class="card"><div class="card-body"><small class="text-muted">In Progress</small><h3 id="kpiInProgress" class="mb-0">0</h3></div></div></div>
+            <div class="col-sm-6 col-xl-3"><div class="card"><div class="card-body"><small class="text-muted">Completed Today</small><h3 id="kpiCompletedToday" class="mb-0">0</h3></div></div></div>
+            <div class="col-sm-6 col-xl-3"><div class="card"><div class="card-body"><small class="text-muted">Active Customers</small><h3 id="kpiActiveCustomers" class="mb-0">0</h3></div></div></div>
+          </div>
+          <div class="row">
+            <div class="col-xl-6"><div class="card"><div class="card-header"><h5>Service Type Distribution</h5></div><div class="card-body"><div id="overviewServicePie" style="height:340px"></div></div></div></div>
+            <div class="col-xl-6"><div class="card"><div class="card-header"><h5>Orders Last 7 Days</h5></div><div class="card-body"><div id="overviewOrdersLine" style="height:340px"></div></div></div></div>
+          </div>
+        </div>
+      </div>
+      <footer class="footer"><div class="container-fluid"><div class="row"><div class="col-md-12 footer-copyright text-center"><p class="mb-0">Copyright 2024 © Tracking System All rights reserved.</p></div></div></div></footer>
+    </div>
+  </div>
+  <script src="{% static 'assets/js/jquery.min.js' %}"></script>
+  <script src="{% static 'assets/js/bootstrap/bootstrap.bundle.min.js' %}"></script>
+  <script src="{% static 'assets/js/icons/feather-icon/feather.min.js' %}"></script>
+  <script src="{% static 'assets/js/icons/feather-icon/feather-icon.js' %}"></script>
+  <script src="{% static 'assets/js/config.js' %}"></script>
+  <script src="{% static 'assets/js/sidebar-menu.js' %}"></script>
+  <script src="{% static 'assets/js/script.js' %}"></script>
+  <script src="{% static 'tracking-system.js' %}"></script>
+  <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+  <script>
+    (function(){
+      if (typeof feather!== 'undefined') feather.replace();
+      const stats = TrackingSystem.getAnalytics();
+      document.getElementById('kpiTotalOrders').textContent = stats.totalOrders;
+      document.getElementById('kpiInProgress').textContent = stats.inProgressOrders;
+      document.getElementById('kpiCompletedToday').textContent = stats.completedToday;
+      document.getElementById('kpiActiveCustomers').textContent = stats.totalCustomers;
+      const pie = echarts.init(document.getElementById('overviewServicePie'));
+      const serviceData = stats.serviceTypeStats || {};
+      pie.setOption({tooltip:{trigger:'item'},series:[{type:'pie',radius:'60%',data:Object.keys(serviceData).map(k=>({name:k,value:serviceData[k]}))}]});
+      const line = echarts.init(document.getElementById('overviewOrdersLine'));
+      const days = stats.dailyStats || [];
+      line.setOption({tooltip:{trigger:'axis'},xAxis:{type:'category',data:days.map(d=>d.date.split(' ').slice(0,3).join(' '))},yAxis:{type:'value'},series:[{type:'line',data:days.map(d=>d.orders)}]});
+    })();
+  </script>
+</body>
+</html>

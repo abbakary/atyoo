@@ -1,0 +1,47 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tracking System - Revenue Analysis</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" type="text/css" href="{% static 'assets/css/font-awesome.css' %}">
+  <link rel="stylesheet" type="text/css" href="{% static 'assets/css/vendors/feather-icon.css' %}">
+  <link rel="stylesheet" type="text/css" href="{% static 'assets/css/vendors/bootstrap.css' %}">
+  <link rel="stylesheet" type="text/css" href="{% static 'assets/css/style.css' %}">
+  <link id="color" rel="stylesheet" href="{% static 'assets/css/color-1.css' %}" media="screen">
+  <link rel="stylesheet" type="text/css" href="{% static 'assets/css/responsive.css' %}">
+</head>
+<body>
+  <div class="page-wrapper compact-wrapper" id="pageWrapper">
+    <div class="page-header"><div class="header-wrapper row m-0"><div class="header-logo-wrapper col-auto p-0"><div class="logo-wrapper"><a href="{% url 'dashboard' %}"><img class="img-fluid for-light" src="{% static 'assets/images/logo/logo_dark.png' %}" alt=""><img class="img-fluid for-dark" src="{% static 'assets/images/logo/logo.png' %}" alt=""></a></div><div class="toggle-sidebar"><i class="status_toggle middle sidebar-toggle" data-feather="align-center"></i></div></div><div class="left-header col"><div class="d-flex align-items-center gap-2 "><h4 class="f-w-600">Revenue Analysis</h4></div></div></div></div>
+    <div class="page-body-wrapper">
+      <div class="page-body">
+        <div class="container-fluid">
+          <div class="row g-3">
+            <div class="col-xl-12"><div class="card"><div class="card-header"><h5>Revenue Trend (Mock)</h5></div><div class="card-body"><div id="revTrend" style="height:360px"></div></div></div></div>
+          </div>
+        </div>
+      </div>
+      <footer class="footer"><div class="container-fluid"><div class="row"><div class="col-md-12 footer-copyright text-center"><p class="mb-0">Copyright 2024 © Tracking System All rights reserved.</p></div></div></div></footer>
+    </div>
+  </div>
+  <script src="{% static 'assets/js/jquery.min.js' %}"></script>
+  <script src="{% static 'assets/js/bootstrap/bootstrap.bundle.min.js' %}"></script>
+  <script src="{% static 'assets/js/icons/feather-icon/feather.min.js' %}"></script>
+  <script src="{% static 'assets/js/icons/feather-icon/feather-icon.js' %}"></script>
+  <script src="{% static 'assets/js/script.js' %}"></script>
+  <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+  <script>
+    (function(){
+      if (typeof feather!=='undefined') feather.replace();
+      const chart = echarts.init(document.getElementById('revTrend'));
+      const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+      const data = months.map(()=> Math.round(10000 + Math.random()*10000));
+      chart.setOption({tooltip:{trigger:'axis'},xAxis:{type:'category',data:months},yAxis:{type:'value',axisLabel:{formatter:v=>'$'+v}},series:[{type:'line',areaStyle:{},data:data}]});
+    })();
+  </script>
+</body>
+</html>

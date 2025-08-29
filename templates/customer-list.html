@@ -1,0 +1,145 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Customer & Order Tracking System">
+    <meta name="keywords" content="tracking, customer management, order management">
+    <meta name="author" content="Tracking App">
+    <link rel="icon" href="{% static 'assets/images/favicon.png' %}" type="image/x-icon">
+    <link rel="shortcut icon" href="{% static 'assets/images/favicon.png' %}" type="image/x-icon">
+    <title>Tracking System - Customer List</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="{% static 'assets/css/font-awesome.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'assets/css/vendors/icofont.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'assets/css/vendors/themify.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'assets/css/vendors/flag-icon.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'assets/css/vendors/feather-icon.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'assets/css/vendors/bootstrap.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'assets/css/style.css' %}">
+    <link id="color" rel="stylesheet" href="{% static 'assets/css/color-1.css' %}" media="screen">
+    <link rel="stylesheet" type="text/css" href="{% static 'assets/css/responsive.css' %}">
+    <style>
+      .stats-card{background:#fff;border-radius:15px;padding:20px;margin-bottom:20px;box-shadow:0 2px 8px rgba(0,0,0,.08);border:1px solid #e9ecef}
+      .filter-section,.customer-table-container{background:#fff;border-radius:15px;padding:20px;margin-bottom:20px;box-shadow:0 2px 8px rgba(0,0,0,.08);border:1px solid #e9ecef}
+      .customer-avatar{width:44px;height:44px;border-radius:50%;background:#667eea;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700}
+      .status-badge{padding:5px 10px;border-radius:20px;font-size:.8em;font-weight:600}
+      .status-active{background-color:rgba(40,167,69,.1);color:#28a745}
+      .status-inactive{background-color:rgba(220,53,69,.1);color:#dc3545}
+      .step-buttons .btn{border-radius:8px}
+    </style>
+  </head>
+  <body>
+    <div class="loader-wrapper"><div class="loader"><div class="loader4"></div></div></div>
+    <div class="tap-top"><i data-feather="chevrons-up"></i></div>
+    <div class="page-wrapper compact-wrapper" id="pageWrapper">
+      <div class="page-header">
+        <div class="header-wrapper row m-0">
+          <form class="form-inline search-full col" action="#" method="get"><div class="form-group w-100"><div class="Typeahead Typeahead--twitterUsers"><div class="u-posRelative"><input class="demo-input Typeahead-input form-control-plaintext w-100" type="text" placeholder="Search customers, orders..." name="q" autofocus><div class="spinner-border Typeahead-spinner" role="status"><span class="sr-only">Loading...</span></div><i class="close-search" data-feather="x"></i></div><div class="Typeahead-menu"></div></div></div></form>
+          <div class="header-logo-wrapper col-auto p-0"><div class="logo-wrapper"><a href="{% url 'dashboard' %}"><img class="img-fluid for-light" src="{% static 'assets/images/logo/logo_dark.png' %}" alt=""><img class="img-fluid for-dark" src="{% static 'assets/images/logo/logo.png' %}" alt=""></a></div><div class="toggle-sidebar"><i class="status_toggle middle sidebar-toggle" data-feather="align-center"></i></div></div>
+          <div class="left-header col-xxl-5 col-xl-6 col-lg-5 col-md-4 col-sm-3 p-0"><div><a class="toggle-sidebar" href="#"><i class="iconly-Category icli"></i></a><div class="d-flex align-items-center gap-2 "><h4 class="f-w-600">Customer List</h4></div></div></div>
+          <div class="nav-right col-xxl-7 col-xl-6 col-md-7 col-8 pull-right right-header p-0 ms-auto"><ul class="nav-menus"><li class="d-md-block d-none"><div class="form search-form mb-0"><div class="input-group"><span class="input-icon"><svg><use href="{% static 'assets/svg/icon-sprite.svg#search-header' %}"></use></svg><input class="w-100" type="search" placeholder="Search customers" id="headerSearch"></span></div></div></li><li><div class="mode"><i class="moon" data-feather="moon"></i></div></li></ul></div>
+        </div>
+      </div>
+      <div class="page-body-wrapper">
+        <div class="sidebar-wrapper" sidebar-layout="stroke-svg">
+          <div>
+            <div class="logo-wrapper"><a href="{% url 'dashboard' %}"><img class="img-fluid" src="{% static 'assets/images/logo/logo.png' %}" alt=""></a><div class="toggle-sidebar"><i class="status_toggle middle sidebar-toggle" data-feather="grid"></i></div></div>
+            <div class="logo-icon-wrapper"><a href="{% url 'dashboard' %}"><img class="img-fluid" src="{% static 'assets/images/logo/logo-icon.png' %}" alt=""></a></div>
+            <nav class="sidebar-main">
+              <div class="left-arrow" id="left-arrow"><i data-feather="arrow-left"></i></div>
+              <div id="sidebar-menu">
+                <ul class="sidebar-links" id="simple-bar">
+                  <li class="back-btn"><a href="{% url 'dashboard' %}"><img class="img-fluid" src="{% static 'assets/images/logo/logo-icon.png' %}" alt=""></a><div class="mobile-back text-end"><span>Back</span><i class="fa fa-angle-right ps-2" aria-hidden="true"></i></div></li>
+                  <li class="sidebar-main-title"><div><h6>Main Menu</h6></div></li>
+                  <li class="sidebar-list"><a class="sidebar-link sidebar-title link-nav" href="{% url 'dashboard' %}"><svg class="stroke-icon"><use href="{% static 'assets/svg/icon-sprite.svg#stroke-home' %}"></use></svg><span>Dashboard</span></a></li>
+                  <li class="sidebar-list"><a class="sidebar-link sidebar-title active" href="#"><svg class="stroke-icon"><use href="{% static 'assets/svg/icon-sprite.svg#stroke-user' %}"></use></svg><span>Customers</span></a>
+                    <ul class="sidebar-submenu"><li><a href="{% url 'customer_register' %}">New Registration</a></li><li><a class="active" href="{% url 'customer_list' %}">View All</a></li><li><a href="{% url 'customer_manage' %}">Manage Customers</a></li><li><a href="{% url 'customer_search' %}">Search Customer</a></li></ul>
+                  </li>
+                  <li class="sidebar-list"><a class="sidebar-link sidebar-title" href="#"><svg class="stroke-icon"><use href="{% static 'assets/svg/icon-sprite.svg#stroke-board' %}"></use></svg><span>Orders</span></a>
+                    <ul class="sidebar-submenu"><li><a href="{% url 'order_create' %}">Create Order</a></li><li><a href="{% url 'order_list' %}">View All Orders</a></li><li><a href="{% url 'order_tracking' %}">Track Orders</a></li></ul>
+                  </li>
+                  <li class="sidebar-list"><a class="sidebar-link sidebar-title" href="#"><svg class="stroke-icon"><use href="{% static 'assets/svg/icon-sprite.svg#stroke-charts' %}"></use></svg><span>Analytics</span></a>
+                    <ul class="sidebar-submenu"><li><a href="{% url 'analytics_overview' %}">Overview</a></li><li><a href="{% url 'analytics_performance' %}">Performance Metrics</a></li><li><a href="{% url 'analytics_customer' %}">Customer Analytics</a></li><li><a href="{% url 'analytics_service' %}">Service Analytics</a></li><li><a href="{% url 'analytics_revenue' %}">Revenue Analysis</a></li></ul>
+                  </li>
+                  <li class="sidebar-list"><a class="sidebar-link sidebar-title" href="#"><svg class="stroke-icon"><use href="{% static 'assets/svg/icon-sprite.svg#stroke-file' %}"></use></svg><span>Reports</span></a>
+                    <ul class="sidebar-submenu"><li><a href="{% url 'reports_daily' %}">Daily Reports</a></li><li><a href="{% url 'reports_customer' %}">Customer Reports</a></li><li><a href="{% url 'reports_service' %}">Service Reports</a></li><li><a href="{% url 'reports_financial' %}">Financial Reports</a></li><li><a href="{% url 'reports_custom' %}">Custom Reports</a></li></ul>
+                  </li>
+                  <li class="sidebar-main-title"><div><h6>System</h6></div></li>
+                  <li class="sidebar-list"><a class="sidebar-link sidebar-title" href="#"><svg class="stroke-icon"><use href="{% static 'assets/svg/icon-sprite.svg#stroke-setting' %}"></use></svg><span>Settings</span></a>
+                    <ul class="sidebar-submenu"><li><a href="{% url 'settings_general' %}">General Settings</a></li><li><a href="{% url 'settings_services' %}">Service Configuration</a></li><li><a href="{% url 'settings_users' %}">User Management</a></li><li><a href="{% url 'settings_backup' %}">Backup & Restore</a></li></ul>
+                  </li>
+                </ul>
+              </div>
+              <div class="right-arrow" id="right-arrow"><i data-feather="arrow-right"></i></div>
+            </nav>
+          </div>
+        </div>
+        <div class="page-body">
+          <div class="container-fluid">
+            <div class="page-title"><div class="row"><div class="col-sm-6 ps-0"><h3>Customer Management</h3><div class="welcome-text mt-2"><p class="text-muted mb-0">Manage all customer information and status</p></div></div><div class="col-sm-6 pe-0"><div class="d-flex align-items-center justify-content-end gap-2"><button class="btn btn-primary" id="addCustomerBtn"><i data-feather="user-plus" class="me-2"></i>Add Customer</button><button class="btn btn-outline-primary" id="exportCustomersBtn"><i data-feather="download" class="me-2"></i>Export</button></div><ol class="breadcrumb mt-2 justify-content-end"><li class="breadcrumb-item"><a href="{% url 'dashboard' %}"><svg class="stroke-icon"><use href="{% static 'assets/svg/icon-sprite.svg#stroke-home' %}"></use></svg></a></li><li class="breadcrumb-item"><a href="#">Customers</a></li><li class="breadcrumb-item active">View All</li></ol></div></div></div>
+          </div>
+          <div class="container-fluid">
+            <div class="row g-3 mb-3">
+              <div class="col-xl-3 col-md-6 col-sm-12"><div class="stats-card"><div class="d-flex justify-content-between align-items-center"><div><h3 id="totalCustomers">0</h3><p>Total Customers</p></div><i class="fas fa-users text-primary"></i></div></div></div>
+              <div class="col-xl-3 col-md-6 col-sm-12"><div class="stats-card"><div class="d-flex justify-content-between align-items-center"><div><h3 id="activeCustomers">0</h3><p>Active Customers</p></div><i class="fas fa-user-check text-success"></i></div></div></div>
+              <div class="col-xl-3 col-md-6 col-sm-12"><div class="stats-card"><div class="d-flex justify-content-between align-items-center"><div><h3 id="newCustomersThisMonth">0</h3><p>New This Month</p></div><i class="fas fa-user-plus text-info"></i></div></div></div>
+              <div class="col-xl-3 col-md-6 col-sm-12"><div class="stats-card"><div class="d-flex justify-content-between align-items-center"><div><h3 id="organizationCustomers">0</h3><p>Organizations</p></div><i class="fas fa-building text-warning"></i></div></div></div>
+            </div>
+
+            <div class="filter-section">
+              <h4>Filter Customers</h4>
+              <div class="row">
+                <div class="col-md-4 mb-3"><label for="searchCustomer" class="form-label">Search</label><input type="text" class="form-control" id="searchCustomer" placeholder="Search by name, email, or phone"></div>
+                <div class="col-md-4 mb-3"><label for="filterCustomerType" class="form-label">Customer Type</label><select class="form-select" id="filterCustomerType"><option value="">All Types</option><option value="government">Government</option><option value="ngo">NGO</option><option value="private-company">Private Company</option><option value="personal">Personal</option><option value="bodaboda">Bodaboda</option></select></div>
+                <div class="col-md-4 mb-3 d-flex align-items-end"><div class="w-100 d-flex gap-2"><button class="btn btn-primary" id="applyFiltersBtn">Apply</button><button class="btn btn-outline-secondary" id="resetFiltersBtn">Reset</button></div></div>
+              </div>
+            </div>
+
+            <div class="customer-table-container">
+              <div class="d-flex justify-content-between align-items-center mb-3"><h4>Customer List</h4><div id="customerCount" class="text-muted"></div></div>
+              <div class="table-responsive">
+                <table class="table table-hover">
+                  <thead><tr><th>Name</th><th>Type</th><th>Phone</th><th>Email</th><th>Total Orders</th><th>Last Visit</th><th>Actions</th></tr></thead>
+                  <tbody id="customerTableBody"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+          <footer class="footer"><div class="container-fluid"><div class="row"><div class="col-md-12 footer-copyright text-center"><p class="mb-0">Copyright 2024 © Tracking System All rights reserved.</p></div></div></div></footer>
+        </div>
+      </div>
+    </div>
+
+    <script src="{% static 'assets/js/jquery.min.js' %}"></script>
+    <script src="{% static 'assets/js/bootstrap/bootstrap.bundle.min.js' %}"></script>
+    <script src="{% static 'assets/js/icons/feather-icon/feather.min.js' %}"></script>
+    <script src="{% static 'assets/js/icons/feather-icon/feather-icon.js' %}"></script>
+    <script src="{% static 'assets/js/scrollbar/simplebar.js' %}"></script>
+    <script src="{% static 'assets/js/scrollbar/custom.js' %}"></script>
+    <script src="{% static 'assets/js/config.js' %}"></script>
+    <script src="{% static 'assets/js/sidebar-menu.js' %}"></script>
+    <script src="{% static 'assets/js/sidebar-pin.js' %}"></script>
+    <script src="{% static 'assets/js/slick/slick.min.js' %}"></script>
+    <script src="{% static 'assets/js/slick/slick.js' %}"></script>
+    <script src="{% static 'assets/js/header-slick.js' %}"></script>
+    <script src="{% static 'assets/js/script.js' %}"></script>
+    <script src="{% static 'tracking-system.js' %}"></script>
+    <script src="{% static 'error-handling.js' %}"></script>
+    <script>
+      $(function(){ if(window.feather){feather.replace();} initPage(); });
+      function initPage(){ loadStats(); loadTable(); bindFilters(); $('#addCustomerBtn').on('click',()=>{window.location.href='{% url 'customer_register' %}';}); $('#exportCustomersBtn').on('click',exportCustomers);}      
+      function loadStats(){ const customers=TrackingSystem.getAllCustomers(); $('#totalCustomers').text(customers.length); const act = customers.filter(c=>c.currentVisitStatus && c.currentVisitStatus!=='departed').length; $('#activeCustomers').text(act); const org = customers.filter(c=>['government','ngo','company','private-company'].includes(c.customerType)).length; $('#organizationCustomers').text(org); const month=new Date().getMonth(); const year=new Date().getFullYear(); const newMonth=customers.filter(c=>{const d=new Date(c.createdAt||c.registrationDate||Date.now()); return d.getMonth()===month && d.getFullYear()===year;}).length; $('#newCustomersThisMonth').text(newMonth); }
+      function bindFilters(){ $('#applyFiltersBtn').on('click', loadTable); $('#resetFiltersBtn').on('click', function(){ $('#searchCustomer').val(''); $('#filterCustomerType').val(''); loadTable(); }); $('#searchCustomer').on('keypress', function(e){ if(e.which===13) loadTable(); }); }
+      function exportCustomers(){ try{ const customers = TrackingSystem.getAllCustomers(); const headers=['ID','Name','Phone','Email','Type','Created']; const rows=customers.map(c=>[c.id,c.name,c.phone,c.email||'',c.customerType||'',c.createdAt||'']); const csv=[headers,...rows].map(r=>r.map(f=>`"${String(f).replace(/"/g,'""')}"`).join(',')).join('\n'); const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download='customers.csv'; a.click(); URL.revokeObjectURL(url); }catch(e){ console.error(e); showUserMessage('Failed to export','error'); } }
+      function loadTable(){ const q=$('#searchCustomer').val().trim().toLowerCase(); const type=$('#filterCustomerType').val(); const all=TrackingSystem.getAllCustomers(); let list=[...all]; if(q){ list=list.filter(c=> (c.name||'').toLowerCase().includes(q) || (c.phone||'').includes(q) || (c.email||'').toLowerCase().includes(q)); } if(type){ list=list.filter(c=>c.customerType===type); } $('#customerCount').text(`Showing ${list.length} of ${all.length} customers`); const tbody=$('#customerTableBody'); if(list.length===0){ tbody.html(`<tr><td colspan="7" class="text-center py-4"><i data-feather="users" style="width:48px;height:48px;"></i><p class="mt-2 mb-0">No customers found</p></td></tr>`); if(window.feather){feather.replace();} return; } let html=''; list.forEach(c=>{ const orders=TrackingSystem.getOrdersByCustomer(c.id)||[]; const last=orders.length?orders[orders.length-1]:null; html+=`<tr><td><div class="d-flex align-items-center"><div class="customer-avatar me-2">${(c.name||'?').split(' ').map(n=>n[0]).join('').toUpperCase().substring(0,2)}</div><div><div class="fw-bold">${c.name||''}</div><small class="text-muted">${c.id||''}</small></div></div></td><td><span class="badge bg-primary">${c.customerType||'personal'}</span></td><td>${c.phone||''}</td><td>${c.email||''}</td><td><span class="badge bg-info">${orders.length}</span></td><td>${ last? new Date(last.arrivalTime).toLocaleDateString(): '<span class="text-muted">Never</span>'}</td><td><div class="btn-group" role="group"><button class="btn btn-outline-primary btn-sm" onclick="viewCustomer('${c.id}')"><i data-feather="eye"></i></button><button class="btn btn-outline-secondary btn-sm" onclick="editCustomer('${c.id}')"><i data-feather="edit"></i></button><button class="btn btn-success btn-sm" onclick="createOrder('${c.id}')"><i data-feather="plus"></i></button></div></td></tr>`; }); tbody.html(html); if(window.feather){feather.replace();} }
+      window.viewCustomer=function(id){ window.location.href='{% url 'customer_search' %}?customerId='+encodeURIComponent(id); };
+      window.editCustomer=function(id){ window.location.href='{% url 'customer_search' %}?customerId='+encodeURIComponent(id)+'&mode=edit'; };
+      window.createOrder=function(id){ window.location.href='{% url 'order_create' %}?customerId='+encodeURIComponent(id); };
+    </script>
+  </body>
+</html>

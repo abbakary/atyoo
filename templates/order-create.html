@@ -1,0 +1,614 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Customer & Order Tracking System">
+    <meta name="keywords" content="tracking, customer management, order management">
+    <meta name="author" content="Tracking App">
+    <meta name="csrf-token" content="{{ csrf_token }}">
+    <link rel="icon" href="{% static 'assets/images/favicon.png' %}" type="image/x-icon">
+    <link rel="shortcut icon" href="{% static 'assets/images/favicon.png' %}" type="image/x-icon">
+    <title>Tracking System - Create Order</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="{% static 'assets/css/font-awesome.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" type="text/css" href="{% static 'assets/css/vendors/icofont.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'assets/css/vendors/themify.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'assets/css/vendors/flag-icon.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'assets/css/vendors/feather-icon.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'assets/css/vendors/bootstrap.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'assets/css/vendors/slick.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'assets/css/vendors/slick-theme.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'assets/css/vendors/scrollbar.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'assets/css/vendors/animate.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'assets/css/style.css' %}">
+    <link id="color" rel="stylesheet" href="{% static 'assets/css/color-1.css' %}" media="screen">
+    <link rel="stylesheet" type="text/css" href="{% static 'assets/css/responsive.css' %}">
+    <style>
+      .order-container{background:#fff;border-radius:15px;padding:30px;box-shadow:0 4px 15px rgba(0,0,0,0.1);border:1px solid #e9ecef}
+      .progress-bar-container{margin-bottom:30px}
+      .progress-bar{background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);transition:width .5s ease}
+      .step-content{display:none}
+      .step-content.active{display:block;animation:fadeIn .5s}
+      @keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+      .step-title{font-size:1.5em;font-weight:600;color:#2c3e50;margin-bottom:25px}
+      .form-label{font-weight:500;color:#495057;margin-bottom:8px}
+      .form-control,.form-select{border-radius:8px;border:1px solid #ced4da;padding:10px 15px}
+      .form-control:focus,.form-select:focus{border-color:#667eea;box-shadow:0 0 0 .25rem rgba(102,126,234,.25)}
+      .btn-primary{background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);border:none;border-radius:8px;padding:10px 25px;font-weight:500;transition:all .3s ease}
+      .btn-primary:hover{background:linear-gradient(135deg,#5a6fd8 0%,#6a4190 100%);transform:translateY(-1px);box-shadow:0 4px 12px rgba(102,126,234,.3)}
+      .btn-outline-secondary{border-radius:8px;padding:10px 25px}
+      .service-card{border:1px solid #e9ecef;border-radius:10px;padding:20px;margin-bottom:20px;cursor:pointer;transition:all .3s ease;height:100%}
+      .service-card:hover{border-color:#667eea;box-shadow:0 4px 15px rgba(102,126,234,.15);transform:translateY(-3px)}
+      .service-card.selected{border-color:#667eea;background-color:rgba(102,126,234,.05)}
+      .service-card i{font-size:2rem;margin-bottom:15px;color:#667eea}
+      .service-card h5{margin-bottom:10px;color:#2c3e50}
+      .service-card p{margin-bottom:0;color:#6c757d;font-size:.9em}
+      .order-summary{background:#f8f9fa;border-radius:10px;padding:20px;margin-bottom:20px}
+      .order-summary h5{margin-bottom:15px;color:#2c3e50;font-weight:600}
+      .order-summary-item{display:flex;justify-content:space-between;margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid #e9ecef}
+      .order-summary-item:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0;font-weight:600;font-size:1.1em}
+      .customer-search-result{border:1px solid #e9ecef;border-radius:8px;padding:15px;margin-bottom:10px;cursor:pointer;transition:all .2s ease}
+      .customer-search-result:hover{background-color:#f8f9fa;border-color:#667eea}
+      .customer-search-result.selected{background-color:rgba(102,126,234,.1);border-color:#667eea}
+      .customer-info{background:#f8f9fa;border-radius:10px;padding:20px;margin:20px 0;border:1px solid #e9ecef}
+      .invalid-feedback{display:none;color:#dc3545;font-size:.875em;margin-top:.25rem}
+      .form-control.is-invalid,.form-select.is-invalid{border-color:#dc3545}
+      .form-control.is-invalid~.invalid-feedback,.form-select.is-invalid~.invalid-feedback{display:block}
+      .step-buttons{display:flex;justify-content:space-between;margin-top:30px;padding-top:20px;border-top:1px solid #e9ecef;gap:12px}
+      @media (max-width:576px){.step-buttons{flex-direction:column}.step-buttons .btn{width:100%}}
+      .summary-icon-48{width:48px;height:48px}
+      @media (max-width:768px){.order-container{padding:20px 15px}.service-card{margin-bottom:15px}}
+      
+      /* Beautiful Popup Modal Styles */
+      .popup-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.6);
+        backdrop-filter: blur(8px);
+        z-index: 9999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+      }
+      .popup-overlay.show {
+        opacity: 1;
+        visibility: visible;
+      }
+      .popup-card {
+        background: #fff;
+        border-radius: 20px;
+        padding: 40px;
+        max-width: 450px;
+        width: 90%;
+        text-align: center;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        transform: scale(0.8) translateY(-50px);
+        transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        position: relative;
+        overflow: hidden;
+      }
+      .popup-overlay.show .popup-card {
+        transform: scale(1) translateY(0);
+      }
+      .popup-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 5px;
+        background: linear-gradient(90deg, #667eea, #764ba2);
+      }
+      .popup-icon {
+        width: 80px;
+        height: 80px;
+        margin: 0 auto 25px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 35px;
+        color: #fff;
+        position: relative;
+        animation: iconPulse 2s infinite;
+      }
+      .popup-icon.success {
+        background: linear-gradient(135deg, #28a745, #20c997);
+        box-shadow: 0 0 0 0 rgba(40, 167, 69, 0.7);
+      }
+      .popup-icon.error {
+        background: linear-gradient(135deg, #dc3545, #e74c3c);
+        box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.7);
+        animation-name: iconPulseError;
+      }
+      @keyframes iconPulse {
+        0% { box-shadow: 0 0 0 0 rgba(40, 167, 69, 0.7); }
+        70% { box-shadow: 0 0 0 20px rgba(40, 167, 69, 0); }
+        100% { box-shadow: 0 0 0 0 rgba(40, 167, 69, 0); }
+      }
+      @keyframes iconPulseError {
+        0% { box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.7); }
+        70% { box-shadow: 0 0 0 20px rgba(220, 53, 69, 0); }
+        100% { box-shadow: 0 0 0 0 rgba(220, 53, 69, 0); }
+      }
+      .popup-title {
+        font-size: 24px;
+        font-weight: 700;
+        margin-bottom: 15px;
+        color: #2c3e50;
+      }
+      .popup-message {
+        font-size: 16px;
+        color: #6c757d;
+        margin-bottom: 30px;
+        line-height: 1.5;
+      }
+      .popup-actions {
+        display: flex;
+        gap: 12px;
+        justify-content: center;
+        flex-wrap: wrap;
+      }
+      .popup-btn {
+        padding: 12px 24px;
+        border-radius: 25px;
+        border: none;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-size: 14px;
+        min-width: 120px;
+      }
+      .popup-btn.primary {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: #fff;
+      }
+      .popup-btn.primary:hover {
+        background: linear-gradient(135deg, #5a6fd8, #6a4190);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+      }
+      .popup-btn.secondary {
+        background: #f8f9fa;
+        color: #6c757d;
+        border: 2px solid #e9ecef;
+      }
+      .popup-btn.secondary:hover {
+        background: #e9ecef;
+        color: #495057;
+        transform: translateY(-2px);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="loader-wrapper"><div class="loader"><div class="loader4"></div></div></div>
+    <div class="tap-top"><i data-feather="chevrons-up"></i></div>
+    <div class="page-wrapper compact-wrapper" id="pageWrapper">
+      <div class="page-header">
+        <div class="header-wrapper row m-0">
+          <form class="form-inline search-full col" action="#" method="get">
+            <div class="form-group w-100"><div class="Typeahead Typeahead--twitterUsers"><div class="u-posRelative"><input class="demo-input Typeahead-input form-control-plaintext w-100" type="text" placeholder="Search customers, orders..." name="q" title="" autofocus><div class="spinner-border Typeahead-spinner" role="status"><span class="sr-only">Loading... </span></div><i class="close-search" data-feather="x"></i></div><div class="Typeahead-menu"> </div></div></div>
+          </form>
+          <div class="header-logo-wrapper col-auto p-0">
+            <div class="logo-wrapper"><a href="{% url 'dashboard' %}"><img class="img-fluid for-light" src="{% static 'assets/images/logo/logo_dark.png' %}" alt="logo-light"><img class="img-fluid for-dark" src="{% static 'assets/images/logo/logo.png' %}" alt="logo-dark"></a></div>
+            <div class="toggle-sidebar"><i class="status_toggle middle sidebar-toggle" data-feather="align-center"></i></div>
+          </div>
+          <div class="left-header col-xxl-5 col-xl-6 col-lg-5 col-md-4 col-sm-3 p-0">
+            <div><a class="toggle-sidebar" href="#"> <i class="iconly-Category icli"> </i></a><div class="d-flex align-items-center gap-2 "><h4 class="f-w-600"></h4></div></div>
+            <div class="welcome-content d-xl-block d-none"><span class="text-truncate col-12"></span></div>
+          </div>
+          <div class="nav-right col-xxl-7 col-xl-6 col-md-7 col-8 pull-right right-header p-0 ms-auto">
+            <ul class="nav-menus">
+              <li class="d-md-block d-none">
+                <div class="form search-form mb-0"><div class="input-group"><span class="input-icon"><svg><use href="{% static 'assets/svg/icon-sprite.svg#search-header' %}"></use></svg><input class="w-100" type="search" placeholder="Search customers, orders..." id="headerSearch"></span></div></div>
+              </li>
+              <li><div class="mode"><i class="moon" data-feather="moon"> </i></div></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="page-body-wrapper">
+        <div class="sidebar-wrapper" sidebar-layout="stroke-svg">
+          <div>
+            <div class="logo-wrapper"> <a href="{% url 'dashboard' %}"><img class="img-fluid" src="{% static 'assets/images/logo/logo.png' %}" alt=""></a>
+              <div class="toggle-sidebar"><i class="status_toggle middle sidebar-toggle" data-feather="grid"> </i></div>
+            </div>
+            <div class="logo-icon-wrapper"><a href="{% url 'dashboard' %}"><img class="img-fluid" src="{% static 'assets/images/logo/logo-icon.png' %}" alt=""></a></div>
+            <nav class="sidebar-main">
+              <div class="left-arrow" id="left-arrow"><i data-feather="arrow-left"></i></div>
+              <div id="sidebar-menu">
+                <ul class="sidebar-links" id="simple-bar">
+                  <li class="back-btn"><a href="{% url 'dashboard' %}"><img class="img-fluid" src="{% static 'assets/images/logo/logo-icon.png' %}" alt=""></a><div class="mobile-back text-end"><span>Back</span><i class="fa fa-angle-right ps-2" aria-hidden="true"></i></div></li>
+                  <li class="pin-title sidebar-main-title"><div><h6>Tracking System</h6></div></li>
+                  <li class="sidebar-main-title"><div><h6 class="lan-1">Main Menu</h6></div></li>
+                  <li class="sidebar-list"><a class="sidebar-link sidebar-title link-nav" href="{% url 'dashboard' %}"><svg class="stroke-icon"><use href="{% static 'assets/svg/icon-sprite.svg#stroke-home' %}"></use></svg><span>Dashboard</span></a></li>
+                  <li class="sidebar-list"><a class="sidebar-link sidebar-title" href="#"><svg class="stroke-icon"><use href="{% static 'assets/svg/icon-sprite.svg#stroke-user' %}"></use></svg><span>Customers</span></a>
+                    <ul class="sidebar-submenu">
+                      <li><a href="{% url 'customer_register' %}">New Registration</a></li>
+                      <li><a href="{% url 'customer_list' %}">View All</a></li>
+                      <li><a href="{% url 'customer_search' %}">Search Customer</a></li>
+                    </ul>
+                  </li>
+                  <li class="sidebar-list"><a class="sidebar-link sidebar-title active" href="#"><svg class="stroke-icon"><use href="{% static 'assets/svg/icon-sprite.svg#stroke-board' %}"></use></svg><span>Orders</span></a>
+                    <ul class="sidebar-submenu">
+                      <li><a class="active" href="{% url 'order_create' %}">Create Order</a></li>
+                      <li><a href="{% url 'order_list' %}">View All Orders</a></li>
+                      <li><a href="{% url 'order_tracking' %}">Track Orders</a></li>
+                    </ul>
+                  </li>
+                  <li class="sidebar-list"><a class="sidebar-link sidebar-title" href="#"><svg class="stroke-icon"><use href="{% static 'assets/svg/icon-sprite.svg#stroke-charts' %}"></use></svg><span>Analytics</span></a>
+                    <ul class="sidebar-submenu">
+                      <li><a href="{% url 'analytics_overview' %}">Overview</a></li>
+                      <li><a href="{% url 'analytics_performance' %}">Performance Metrics</a></li>
+                      <li><a href="{% url 'analytics_customer' %}">Customer Analytics</a></li>
+                      <li><a href="{% url 'analytics_service' %}">Service Analytics</a></li>
+                      <li><a href="{% url 'analytics_revenue' %}">Revenue Analysis</a></li>
+                    </ul>
+                  </li>
+                  <li class="sidebar-list"><a class="sidebar-link sidebar-title" href="#"><svg class="stroke-icon"><use href="{% static 'assets/svg/icon-sprite.svg#stroke-file' %}"></use></svg><span>Reports</span></a>
+                    <ul class="sidebar-submenu">
+                      <li><a href="{% url 'reports_daily' %}">Daily Reports</a></li>
+                      <li><a href="{% url 'reports_customer' %}">Customer Reports</a></li>
+                      <li><a href="{% url 'reports_service' %}">Service Reports</a></li>
+                      <li><a href="{% url 'reports_financial' %}">Financial Reports</a></li>
+                      <li><a href="{% url 'reports_custom' %}">Custom Reports</a></li>
+                    </ul>
+                  </li>
+                  <li class="sidebar-main-title"><div><h6 class="lan-1">System</h6></div></li>
+                  <li class="sidebar-list"><a class="sidebar-link sidebar-title" href="#"><svg class="stroke-icon"><use href="{% static 'assets/svg/icon-sprite.svg#stroke-setting' %}"></use></svg><span>Settings</span></a>
+                    <ul class="sidebar-submenu">
+                      <li><a href="{% url 'settings_general' %}">General Settings</a></li>
+                      <li><a href="{% url 'settings_services' %}">Service Configuration</a></li>
+                      <li><a href="{% url 'settings_users' %}">User Management</a></li>
+                      <li><a href="{% url 'settings_backup' %}">Backup & Restore</a></li>
+                    </ul>
+                  </li>
+                </ul>
+              </div>
+              <div class="right-arrow" id="right-arrow"><i data-feather="arrow-right"></i></div>
+            </nav>
+          </div>
+        </div>
+        <div class="page-body">
+          <div class="container-fluid">
+            <div class="page-title">
+              <div class="row">
+                <div class="col-sm-6 ps-0">
+                  <h3>Create New Order</h3>
+                  <div class="welcome-text mt-2"><p class="text-muted mb-0">Create a new service order for a customer</p></div>
+                </div>
+                <div class="col-sm-6 pe-0">
+                  <div class="d-flex align-items-center justify-content-end gap-3">
+                    <div class="dashboard-actions">
+                      <button class="btn btn-outline-primary" onclick="window.location.href='{% url 'dashboard' %}'"><i data-feather="arrow-left" class="me-2"></i>Back to Dashboard</button>
+                    </div>
+                  </div>
+                  <ol class="breadcrumb mt-2">
+                    <li class="breadcrumb-item"><a href="{% url 'dashboard' %}"><svg class="stroke-icon"><use href="{% static 'assets/svg/icon-sprite.svg#stroke-home' %}"></use></svg></a></li>
+                    <li class="breadcrumb-item"><a href="#">Orders</a></li>
+                    <li class="breadcrumb-item active">Create Order</li>
+                  </ol>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="container-fluid">
+            <div class="order-container">
+              <div class="progress-bar-container"><div class="progress"><div class="progress-bar" role="progressbar" style="width: 25%;" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100" id="orderProgressBar">Step 1 of 4</div></div></div>
+              <form id="orderForm" novalidate>
+                <div id="step1" class="step-content active">
+                  <h4 class="step-title">Step 1: Customer Information</h4>
+                  <div class="row">
+                    <div class="col-md-8 mb-4">
+                      <label for="customerSearch" class="form-label">Search Customer</label>
+                      <div class="input-group">
+                        <input type="text" class="form-control" id="customerSearch" placeholder="Search by name, phone, or email" required>
+                        <button class="btn btn-outline-secondary" type="button" id="searchCustomerBtn"><i data-feather="search"></i></button>
+                      </div>
+                      <div class="invalid-feedback" id="customerSearchFeedback">Please enter a search term</div>
+                    </div>
+                    <div class="col-md-4 mb-4 d-flex align-items-end">
+                      <div class="w-100">
+                        <label class="form-label d-block mb-2">Or</label>
+                        <button type="button" class="btn btn-outline-primary w-100" id="newCustomerBtn"><i data-feather="user-plus" class="me-2"></i>Add New Customer</button>
+                      </div>
+                    </div>
+                  </div>
+                  <div id="customerSearchResults" class="mb-4 d-none">
+                    <h6 class="mb-3">Search Results</h6>
+                    <div id="customerResultsList"></div>
+                  </div>
+                  <div id="selectedCustomerInfo" class="customer-info d-none">
+                    <h6 class="mb-3">Selected Customer</h6>
+                    <div class="row">
+                      <div class="col-md-6"><p><strong>Name:</strong> <span id="customerName">-</span></p><p><strong>Phone:</strong> <span id="customerPhone">-</span></p></div>
+                      <div class="col-md-6"><p><strong>Email:</strong> <span id="customerEmail">-</span></p><p><strong>Address:</strong> <span id="customerAddress">-</span></p></div>
+                    </div>
+                    <input type="hidden" id="customerId" name="customerId">
+                  </div>
+                  <div class="step-buttons">
+                    <button type="button" class="btn btn-outline-secondary" onclick="window.location.href='{% url 'dashboard' %}'"><i data-feather="x" class="me-2"></i>Cancel</button>
+                    <button type="button" class="btn btn-primary" id="nextToStep2">Next <i data-feather="arrow-right" class="ms-2"></i></button>
+                  </div>
+                </div>
+
+                <div id="step2" class="step-content">
+                  <h4 class="step-title">Step 2: Select Service Type</h4>
+                  <div class="row">
+                    <div class="col-md-4 mb-4"><div class="service-card text-center" data-service-type="car-service"><i data-feather="settings"></i><h5>Car Service</h5><p>General maintenance and repair services</p></div></div>
+                    <div class="col-md-4 mb-4"><div class="service-card text-center" data-service-type="tire-sales"><i data-feather="circle"></i><h5>Tire Sales</h5><p>New tires and wheel services</p></div></div>
+                    <div class="col-md-4 mb-4"><div class="service-card text-center" data-service-type="consultation"><i data-feather="message-square"></i><h5>Consultation</h5><p>Expert advice and consultation</p></div></div>
+                  </div>
+                  <div class="invalid-feedback" id="serviceTypeFeedback">Please select a service type</div>
+                  <input type="hidden" id="serviceType" name="serviceType" required>
+                  <div class="step-buttons">
+                    <button type="button" class="btn btn-outline-secondary" id="backToStep1"><i data-feather="arrow-left" class="me-2"></i>Back</button>
+                    <button type="button" class="btn btn-primary" id="nextToStep3">Next <i data-feather="arrow-right" class="ms-2"></i></button>
+                  </div>
+                </div>
+
+                <div id="step3" class="step-content">
+                  <h4 class="step-title">Step 3: Service Details</h4>
+                  <div id="serviceDetailsContent"><div class="alert alert-info"><i data-feather="info" class="me-2"></i> Please select a service type to see available options.</div></div>
+                  <div class="step-buttons">
+                    <button type="button" class="btn btn-outline-secondary" id="backToStep2"><i data-feather="arrow-left" class="me-2"></i>Back</button>
+                    <button type="button" class="btn btn-primary" id="nextToStep4">Next <i data-feather="arrow-right" class="ms-2"></i></button>
+                  </div>
+                </div>
+
+                <div id="step4" class="step-content">
+                  <h4 class="step-title">Step 4: Additional Information</h4>
+                  <div class="row">
+                    <div class="col-md-6 mb-4"><label for="priority" class="form-label">Priority</label><select class="form-select" id="priority" name="priority" required><option value="" disabled selected>Select priority</option><option value="low">Low</option><option value="normal">Normal</option><option value="high">High</option><option value="urgent">Urgent</option></select><div class="invalid-feedback">Please select a priority</div></div>
+                    <div class="col-md-6 mb-4"><label for="estimatedDuration" class="form-label">Estimated Duration (minutes)</label><input type="number" class="form-control" id="estimatedDuration" name="estimatedDuration" min="15" step="15" value="60" required><div class="invalid-feedback" id="estimatedDurationFeedback">Please enter a valid duration</div></div>
+                  </div>
+                  <div class="row"><div class="col-12 mb-4"><label for="notes" class="form-label">Notes</label><textarea class="form-control" id="notes" name="notes" rows="3" placeholder="Enter any additional notes or special instructions"></textarea></div></div>
+                  <div class="step-buttons">
+                    <button type="button" class="btn btn-outline-secondary" id="backToStep3"><i data-feather="arrow-left" class="me-2"></i>Back</button>
+                    <button type="submit" class="btn btn-primary" id="submitOrderBtn"><i data-feather="check" class="me-2"></i>Create Order</button>
+                  </div>
+                </div>
+
+                <div id="step5" class="step-content">
+                  <h4 class="step-title">Order Confirmation</h4>
+                  <div class="order-summary"><h5>Order Summary</h5><div id="orderSummaryContent"><div class="text-center text-muted py-4"><i data-feather="file-text" class="summary-icon-48"></i><p class="mt-2">Order summary will appear here as you fill in the form</p></div></div></div>
+                  <div class="step-buttons">
+                    <button type="button" class="btn btn-outline-secondary" id="backToStep4"><i data-feather="arrow-left" class="me-2"></i>Back</button>
+                    <button type="button" class="btn btn-success" id="confirmOrderBtn"><i data-feather="check-circle" class="me-2"></i>Confirm & Place Order</button>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+          <footer class="footer"><div class="container-fluid"><div class="row"><div class="col-md-12 footer-copyright text-center"><p class="mb-0">Copyright 2024 Tracking System All rights reserved.</p></div></div></div></footer>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Beautiful Popup Modal -->
+    <div class="popup-overlay" id="popupOverlay">
+      <div class="popup-card">
+        <div class="popup-icon" id="popupIcon">
+          <i id="popupIconSymbol"></i>
+        </div>
+        <h3 class="popup-title" id="popupTitle">Title</h3>
+        <p class="popup-message" id="popupMessage">Message content goes here</p>
+        <div class="popup-actions" id="popupActions">
+          <button class="popup-btn primary" id="popupPrimaryBtn">OK</button>
+        </div>
+      </div>
+    </div>
+
+    <script src="{% static 'assets/js/jquery.min.js' %}"></script>
+    <script src="{% static 'assets/js/bootstrap/bootstrap.bundle.min.js' %}"></script>
+    <script src="{% static 'assets/js/icons/feather-icon/feather.min.js' %}"></script>
+    <script src="{% static 'assets/js/icons/feather-icon/feather-icon.js' %}"></script>
+    <script src="{% static 'assets/js/scrollbar/simplebar.js' %}"></script>
+    <script src="{% static 'assets/js/scrollbar/custom.js' %}"></script>
+    <script src="{% static 'assets/js/config.js' %}"></script>
+    <script src="{% static 'assets/js/sidebar-menu.js' %}"></script>
+    <script src="{% static 'assets/js/sidebar-pin.js' %}"></script>
+    <script src="{% static 'assets/js/slick/slick.min.js' %}"></script>
+    <script src="{% static 'assets/js/slick/slick.js' %}"></script>
+    <script src="{% static 'assets/js/header-slick.js' %}"></script>
+    <script src="{% static 'assets/js/script.js' %}"></script>
+    <script src="{% static 'tracking-system.js' %}"></script>
+    <script src="{% static 'error-handling.js' %}"></script>
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        let currentStep = 1; const totalSteps = 4;
+        function updateProgressBar(){const p=((currentStep-1)/(totalSteps-1))*100;const el=document.getElementById('orderProgressBar');el.style.width=p+'%';el.setAttribute('aria-valuenow',p);el.textContent=`Step ${currentStep} of ${totalSteps}`;}
+        function showStep(n){document.querySelectorAll('.step-content').forEach(s=>s.classList.remove('active'));const el=document.getElementById('step'+n); if(el){el.classList.add('active'); currentStep=n; updateProgressBar();}}
+        function selectCustomer(customer){document.getElementById('customerName').textContent=customer.name||'-';document.getElementById('customerPhone').textContent=customer.phone||'-';document.getElementById('customerEmail').textContent=customer.email||'-';document.getElementById('customerAddress').textContent=customer.address||'-';document.getElementById('customerId').value=customer.id;document.getElementById('selectedCustomerInfo').classList.remove('d-none');document.getElementById('customerSearchResults').classList.add('d-none');document.getElementById('customerSearch').value='';updateOrderSummary();}
+        function renderCustomerResults(list){const c=document.getElementById('customerResultsList');c.innerHTML='';list.forEach(customer=>{const div=document.createElement('div');div.className='customer-search-result';div.innerHTML=`<div class="d-flex justify-content-between align-items-center"><div><h6 class="mb-1">${customer.name}</h6><p class="mb-0 text-muted">${customer.phone} ${customer.email?`| ${customer.email}`:''}</p></div><button class="btn btn-sm btn-outline-primary">Select</button></div>`;div.querySelector('button').addEventListener('click',()=>selectCustomer(customer));c.appendChild(div);});document.getElementById('customerSearchResults').style.display='block';}
+
+        document.getElementById('searchCustomerBtn').addEventListener('click', runCustomerSearch);
+        document.getElementById('customerSearch').addEventListener('keydown', function(e){ if(e.key==='Enter'){ e.preventDefault(); runCustomerSearch(); }});
+        let searchTimer=null; document.getElementById('customerSearch').addEventListener('input', function(){ clearTimeout(searchTimer); const v=this.value.trim(); if(v.length<3){ document.getElementById('customerSearchResults').classList.add('d-none'); return;} searchTimer=setTimeout(runCustomerSearch, 300); });
+        function runCustomerSearch(){const term=document.getElementById('customerSearch').value.trim();document.getElementById('customerSearch').classList.remove('is-invalid'); if(!term){document.getElementById('customerSearch').classList.add('is-invalid');document.getElementById('customerSearchFeedback').textContent='Please enter a search term';return;} try{const results=TrackingSystem.searchCustomers(term)||[]; if(results.length===0){document.getElementById('customerResultsList').innerHTML='<div class="text-center text-muted py-3">No customers found</div>';document.getElementById('customerSearchResults').classList.remove('d-none');} else {renderCustomerResults(results); document.getElementById('customerSearchResults').classList.remove('d-none');}}catch(e){console.error(e);showUserMessage('Failed to search customers','error');}}
+        document.getElementById('newCustomerBtn').addEventListener('click', function(){window.location.href = '{% url 'customer_register' %}';});
+
+        document.querySelectorAll('.service-card').forEach(card=>{card.addEventListener('click',function(){document.querySelectorAll('.service-card').forEach(c=>c.classList.remove('selected'));this.classList.add('selected');const type=this.getAttribute('data-service-type');document.getElementById('serviceType').value=type;document.getElementById('serviceType').classList.remove('is-invalid');showServiceDetails(type);updateOrderSummary();});});
+
+        document.getElementById('nextToStep2').addEventListener('click', function(e){e.preventDefault(); if(!document.getElementById('customerId').value){showUserMessage('Please select a customer','warning'); return;} showStep(2);});
+        document.getElementById('nextToStep3').addEventListener('click', function(e){e.preventDefault(); if(!document.getElementById('serviceType').value){document.getElementById('serviceTypeFeedback').textContent='Please select a service type'; return;} showStep(3);});
+        document.getElementById('nextToStep4').addEventListener('click', function(e){e.preventDefault(); showStep(4);});
+        document.getElementById('backToStep1').addEventListener('click', ()=>showStep(1));
+        document.getElementById('backToStep2').addEventListener('click', ()=>showStep(2));
+        document.getElementById('backToStep3').addEventListener('click', ()=>showStep(3));
+        document.getElementById('backToStep4').addEventListener('click', ()=>showStep(4));
+
+        function showServiceDetails(serviceType){const container=document.getElementById('serviceDetailsContent');container.innerHTML='<div class="text-center"><div class="spinner-border text-primary" role="status"><span class="sr-only">Loading...</span></div></div>'; setTimeout(()=>{let html=''; if(serviceType==='car-service'){html=`<div class="row"><div class="col-md-6 mb-3"><label for="plateNumber" class="form-label">Plate Number</label><input type="text" class="form-control" id="plateNumber" name="plateNumber" placeholder="e.g. T123 ABC" required><div class="invalid-feedback" id="plateNumberFeedback"></div></div><div class="col-md-6 mb-3"><label for="carMake" class="form-label">Car Make</label><input type="text" class="form-control" id="carMake" name="carMake" placeholder="e.g. Toyota, Honda, Ford" required><div class="invalid-feedback" id="carMakeFeedback"></div></div></div><div class="row"><div class="col-md-6 mb-3"><label for="carModel" class="form-label">Car Model</label><input type="text" class="form-control" id="carModel" name="carModel" placeholder="e.g. Camry, Civic, Mustang" required><div class="invalid-feedback" id="carModelFeedback"></div></div><div class="col-md-6 mb-3"><label for="vehicleType" class="form-label">Vehicle Type</label><select class="form-select" id="vehicleType" name="vehicleType" required><option value="">Select vehicle type</option><option value="sedan">Sedan</option><option value="suv">SUV</option><option value="truck">Truck</option><option value="van">Van</option><option value="motorcycle">Motorcycle</option><option value="other">Other</option></select><div class="invalid-feedback" id="vehicleTypeFeedback"></div></div></div><div class="row"><div class="col-md-12 mb-3"><label class="form-label">Service Selection</label><div class="service-checkbox-group"><div class="form-check"><input class="form-check-input" type="checkbox" name="carServices" value="oil-change" id="serviceOilChange"><label class="form-check-label" for="serviceOilChange">Oil Change</label></div><div class="form-check"><input class="form-check-input" type="checkbox" name="carServices" value="engine-diagnostics" id="serviceEngineDiagnostics"><label class="form-check-label" for="serviceEngineDiagnostics">Engine Diagnostics</label></div><div class="form-check"><input class="form-check-input" type="checkbox" name="carServices" value="brake-repair" id="serviceBrakeRepair"><label class="form-check-label" for="serviceBrakeRepair">Brake Repair</label></div><div class="form-check"><input class="form-check-input" type="checkbox" name="carServices" value="tire-rotation" id="serviceTireRotation"><label class="form-check-label" for="serviceTireRotation">Tire Rotation</label></div><div class="form-check"><input class="form-check-input" type="checkbox" name="carServices" value="wheel-alignment" id="serviceWheelAlignment"><label class="form-check-label" for="serviceWheelAlignment">Wheel Alignment</label></div><div class="form-check"><input class="form-check-input" type="checkbox" name="carServices" value="battery-check" id="serviceBatteryCheck"><label class="form-check-label" for="serviceBatteryCheck">Battery Check</label></div><div class="form-check"><input class="form-check-input" type="checkbox" name="carServices" value="fluid-topup" id="serviceFluidTopUp"><label class="form-check-label" for="serviceFluidTopUp">Fluid Top-Up</label></div></div><div class="invalid-feedback" id="carServiceTypeFeedback"></div></div></div><div class="row"><div class="col-md-12 mb-3"><label for="problemDescription" class="form-label">Problem Description</label><textarea class="form-control" id="problemDescription" name="problemDescription" rows="3" placeholder="Describe the issue or service needed in detail"></textarea></div></div>`;} else if(serviceType==='tire-sales'){html=`<div class="row"><div class="col-md-6 mb-3"><label for="tireItemName" class="form-label">Item Name</label><select class="form-select" id="tireItemName" name="tireItemName" required><option value="">Select Tire Type</option><option value="all-season">All-Season</option><option value="summer">Summer</option><option value="winter">Winter</option><option value="performance">Performance</option><option value="off-road">Off-Road</option><option value="eco">Eco-Friendly</option><option value="run-flat">Run-Flat</option></select><div class="invalid-feedback" id="tireItemNameFeedback"></div></div><div class="col-md-6 mb-3"><label for="tireBrand" class="form-label">Brand</label><select class="form-select" id="tireBrand" name="tireBrand"><option value="">Select a brand</option><option value="michelin">Michelin</option><option value="bridgestone">Bridgestone</option><option value="goodyear">Goodyear</option><option value="continental">Continental</option><option value="pirelli">Pirelli</option><option value="other">Other</option></select><div class="invalid-feedback" id="tireBrandFeedback"></div></div></div><div class="row"><div class="col-md-6 mb-3"><label for="tireQuantity" class="form-label">Quantity</label><input type="number" class="form-control" id="tireQuantity" name="tireQuantity" min="1" value="1" required><div class="invalid-feedback" id="tireQuantityFeedback"></div></div><div class="col-md-6 mb-3"><label for="tireType" class="form-label">Tire Condition</label><select class="form-select" id="tireType" name="tireType" required><option value="">Select condition</option><option value="new">New</option><option value="used">Used</option><option value="refurbished">Refurbished</option></select><div class="invalid-feedback" id="tireTypeFeedback"></div></div></div>`;} else if(serviceType==='consultation'){html=`<div class="row"><div class="col-md-6 mb-3"><label for="inquiryType" class="form-label">Inquiry Type</label><select class="form-select" id="inquiryType" name="inquiryType" required><option value="">Select consultation type</option><option value="vehicle-purchase">Vehicle Purchase</option><option value="service-advice">Service Advice</option><option value="maintenance-plan">Maintenance Plan</option><option value="upgrade-options">Upgrade Options</option><option value="other">Other</option></select><div class="invalid-feedback" id="inquiryTypeFeedback"></div></div><div class="col-md-6 mb-3"><label for="contactPreference" class="form-label">Contact Preference</label><select class="form-select" id="contactPreference" name="contactPreference" required><option value="">Select preference</option><option value="phone">Phone</option><option value="email">Email</option></select><div class="invalid-feedback" id="contactPreferenceFeedback"></div></div></div><div class="row"><div class="col-md-6 mb-3"><label for="followUpDate" class="form-label">Follow-up Date (Optional)</label><input type="date" class="form-control" id="followUpDate" name="followUpDate"></div><div class="col-md-12 mb-3"><label for="inquiryQuestions" class="form-label">Questions</label><textarea class="form-control" id="inquiryQuestions" name="inquiryQuestions" rows="4" placeholder="Enter customer's questions here" required></textarea><div class="invalid-feedback" id="inquiryQuestionsFeedback"></div></div></div>`;} container.innerHTML=html; $('#serviceDetailsContent').on('change','input, select, textarea',function(){updateOrderSummary();}); if(window.feather){feather.replace();}},300);}
+
+        function updateOrderSummary(){const summary=document.getElementById('orderSummaryContent'); if(!summary) return; const customerName=document.getElementById('customerName')?.textContent||'Not selected'; const serviceType=document.getElementById('serviceType')?.value||''; const priority=document.getElementById('priority')?.value||'Normal'; const estimatedDuration=document.getElementById('estimatedDuration')?.value||'60'; const notes=document.getElementById('notes')?.value||'None'; if(!document.getElementById('customerId').value){summary.innerHTML='<div class="text-center text-muted py-4"><i data-feather="file-text" class="summary-icon-48"></i><p class="mt-2">Order summary will appear here as you fill in the form</p></div>'; if(window.feather){feather.replace();} return;} if(!serviceType){summary.innerHTML=`<div class="order-summary-item"><span>Customer</span><span>${customerName}</span></div><div class="text-center text-muted py-3">Please select a service type.</div>`; if(window.feather){feather.replace();} return;} let serviceTypeName=''; let servicePrice=0; if(serviceType==='car-service'){serviceTypeName='Car Service'; servicePrice=100; const selectedServices=Array.from(document.querySelectorAll('input[name="carServices"]:checked')).map(cb=>cb.nextElementSibling.textContent); if(selectedServices.length>0){servicePrice+=selectedServices.length*25; summary.insertAdjacentHTML('beforeend', `<div class="order-summary-item"><span>Services</span><span style="text-align:right;max-width:60%">${selectedServices.join(', ')}</span></div>`);} } else if(serviceType==='tire-sales'){serviceTypeName='Tire Sales'; servicePrice=200; const qty=parseInt(document.getElementById('tireQuantity')?.value||'1'); servicePrice*=qty;} else if(serviceType==='consultation'){serviceTypeName='Consultation'; servicePrice=50;} let priorityMultiplier=1; if(priority==='high') priorityMultiplier=1.2; else if(priority==='urgent') priorityMultiplier=1.5; let totalPrice=servicePrice*priorityMultiplier; if(estimatedDuration){const hours=estimatedDuration/60; totalPrice+=hours*50;} const formatted=totalPrice.toFixed(2); summary.innerHTML=`<div class=\"order-summary-item\"><span>Customer</span><span>${customerName}</span></div><div class=\"order-summary-item\"><span>Service Type</span><span>${serviceTypeName}</span></div><div class=\"order-summary-item\"><span>Priority</span><span>${priority.charAt(0).toUpperCase()+priority.slice(1)}</span></div><div class=\"order-summary-item\"><span>Estimated Duration</span><span>${estimatedDuration} minutes</span></div><div class=\"order-summary-item\"><span>Total Price</span><span>$${formatted}</span></div>`; if(window.feather){feather.replace();}}
+
+        document.getElementById('orderForm').addEventListener('submit', function(e){e.preventDefault(); if(!validateOrderForm()) return; showStep(5); updateOrderSummary();});
+        document.getElementById('confirmOrderBtn').addEventListener('click', function(){ submitOrder(); });
+
+        function validateOrderForm(){let ok=true; document.querySelectorAll('.invalid-feedback').forEach(el=>el.textContent=''); document.querySelectorAll('.is-invalid').forEach(el=>el.classList.remove('is-invalid')); if(!document.getElementById('customerId').value){document.getElementById('customerSearch').classList.add('is-invalid'); document.getElementById('customerSearchFeedback').textContent='Please select a customer.'; ok=false;} const t=document.getElementById('serviceType').value; if(!t){document.getElementById('serviceTypeFeedback').textContent='Please select a service type.'; ok=false;} else {if(t==='car-service'){if(!document.getElementById('plateNumber').value){document.getElementById('plateNumber').classList.add('is-invalid');document.getElementById('plateNumberFeedback').textContent='Plate number is required.'; ok=false;} if(!document.getElementById('carMake').value){document.getElementById('carMake').classList.add('is-invalid');document.getElementById('carMakeFeedback').textContent='Car make is required.'; ok=false;} if(!document.getElementById('carModel').value){document.getElementById('carModel').classList.add('is-invalid');document.getElementById('carModelFeedback').textContent='Car model is required.'; ok=false;} if(!document.getElementById('vehicleType').value){document.getElementById('vehicleType').classList.add('is-invalid');document.getElementById('vehicleTypeFeedback').textContent='Vehicle type is required.'; ok=false;} if(document.querySelectorAll('input[name="carServices"]:checked').length===0){document.getElementById('carServiceTypeFeedback').textContent='Please select at least one service.'; ok=false;}} if(t==='tire-sales'){if(!document.getElementById('tireItemName').value){document.getElementById('tireItemName').classList.add('is-invalid');document.getElementById('tireItemNameFeedback').textContent='Tire type is required.'; ok=false;} if(!document.getElementById('tireBrand').value){document.getElementById('tireBrand').classList.add('is-invalid');document.getElementById('tireBrandFeedback').textContent='Tire brand is required.'; ok=false;} if(!document.getElementById('tireQuantity').value){document.getElementById('tireQuantity').classList.add('is-invalid');document.getElementById('tireQuantityFeedback').textContent='Quantity is required.'; ok=false;} if(!document.getElementById('tireType').value){document.getElementById('tireType').classList.add('is-invalid');document.getElementById('tireTypeFeedback').textContent='Tire condition is required.'; ok=false;}} if(t==='consultation'){if(!document.getElementById('inquiryType').value){document.getElementById('inquiryType').classList.add('is-invalid');document.getElementById('inquiryTypeFeedback').textContent='Inquiry type is required.'; ok=false;} if(!document.getElementById('inquiryQuestions').value){document.getElementById('inquiryQuestions').classList.add('is-invalid');document.getElementById('inquiryQuestionsFeedback').textContent='Please enter the customer\'s questions.'; ok=false;}}}
+          return ok;}
+
+        async function submitOrder(){
+          try {
+            const submitBtn = document.getElementById('confirmOrderBtn');
+            const original = submitBtn.innerHTML;
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Creating Order...';
+            
+            // Gather basic order data
+            const customerId = document.getElementById('customerId').value;
+            const serviceType = document.getElementById('serviceType').value;
+            const priority = document.getElementById('priority').value || 'normal';
+            const estimatedDuration = document.getElementById('estimatedDuration').value || '60';
+            const notes = document.getElementById('notes').value || '';
+            
+            // Prepare service details based on service type
+            let serviceDetails = {};
+            
+            if (serviceType === 'car-service') {
+              const selectedServices = Array.from(document.querySelectorAll('input[name="carServices"]:checked')).map(cb => cb.value);
+              serviceDetails = {
+                plateNumber: document.getElementById('plateNumber').value,
+                carMake: document.getElementById('carMake').value,
+                carModel: document.getElementById('carModel').value,
+                vehicleType: document.getElementById('vehicleType').value,
+                carServices: selectedServices,
+                problemDescription: document.getElementById('problemDescription').value || ''
+              };
+            } else if (serviceType === 'tire-sales') {
+              serviceDetails = {
+                tireItemName: document.getElementById('tireItemName').value,
+                tireBrand: document.getElementById('tireBrand').value,
+                tireQuantity: parseInt(document.getElementById('tireQuantity').value) || 1,
+                tireType: document.getElementById('tireType').value
+              };
+            } else if (serviceType === 'consultation') {
+              serviceDetails = {
+                inquiryType: document.getElementById('inquiryType').value,
+                contactPreference: document.getElementById('contactPreference').value,
+                followUpDate: document.getElementById('followUpDate').value || null,
+                inquiryQuestions: document.getElementById('inquiryQuestions').value
+              };
+            }
+            
+            // Create order payload for backend
+            const orderPayload = {
+              customerId: customerId,
+              serviceType: serviceType,
+              priority: priority,
+              estimatedCompletion: estimatedDuration,
+              description: notes,
+              serviceDetails: serviceDetails
+            };
+            
+            // Call the backend API
+            const result = await TrackingSystem.createOrder(orderPayload);
+            
+            if (result.success) {
+              // Success - show success message and redirect
+              showUserMessage(`Order ${result.order.orderNumber} created successfully!`, 'success');
+              setTimeout(() => {
+                window.location.href = "{% url 'order_list' %}";
+              }, 2000);
+            } else {
+              // Error from backend
+              showUserMessage(result.error || 'Failed to create order', 'error');
+              submitBtn.disabled = false;
+              submitBtn.innerHTML = original;
+            }
+          } catch (error) {
+            console.error('Error creating order:', error);
+            showUserMessage('Network error occurred. Please try again.', 'error');
+            const submitBtn = document.getElementById('confirmOrderBtn');
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<i data-feather="check-circle" class="me-2"></i>Confirm & Place Order';
+          }
+        }
+        }
+
+        // Beautiful popup message system
+        function showUserMessage(message, type = 'success', actions = null) {
+          const overlay = document.getElementById('popupOverlay');
+          const icon = document.getElementById('popupIcon');
+          const iconSymbol = document.getElementById('popupIconSymbol');
+          const title = document.getElementById('popupTitle');
+          const messageEl = document.getElementById('popupMessage');
+          const actionsEl = document.getElementById('popupActions');
+          
+          // Configure popup based on type
+          if (type === 'success') {
+            icon.className = 'popup-icon success';
+            iconSymbol.className = 'fas fa-check';
+            title.textContent = 'Success!';
+          } else if (type === 'error') {
+            icon.className = 'popup-icon error';
+            iconSymbol.className = 'fas fa-exclamation-triangle';
+            title.textContent = 'Error';
+          } else if (type === 'warning') {
+            icon.className = 'popup-icon error';
+            iconSymbol.className = 'fas fa-exclamation';
+            title.textContent = 'Warning';
+          }
+          
+          messageEl.textContent = message;
+          
+          // Setup actions
+          if (actions && actions.length > 0) {
+            actionsEl.innerHTML = '';
+            actions.forEach((action, index) => {
+              const btn = document.createElement('button');
+              btn.className = `popup-btn ${index === 0 ? 'primary' : 'secondary'}`;
+              btn.textContent = action.text;
+              btn.onclick = () => {
+                hidePopup();
+                if (action.callback) action.callback();
+              };
+              actionsEl.appendChild(btn);
+            });
+          } else {
+            actionsEl.innerHTML = '<button class="popup-btn primary" onclick="hidePopup()">OK</button>';
+          }
+          
+          // Show popup
+          overlay.classList.add('show');
+          
+          // Auto-hide for success messages
+          if (type === 'success') {
+            setTimeout(() => {
+              hidePopup();
+            }, 3000);
+          }
+        }
+        
+        function hidePopup() {
+          const overlay = document.getElementById('popupOverlay');
+          overlay.classList.remove('show');
+        }
+        
+        // Close popup when clicking overlay
+        document.getElementById('popupOverlay').addEventListener('click', function(e) {
+          if (e.target === this) {
+            hidePopup();
+          }
+        });
+
+        function initFromUrl(){const params=new URLSearchParams(window.location.search); const cid=params.get('customerId'); if(cid){const customer=TrackingSystem.getCustomerById(cid); if(customer){selectCustomer(customer);} }
+        }
+
+        function bootstrap(){if(window.feather){feather.replace();} initFromUrl(); showStep(1);} bootstrap();
+      });
+    </script>
+  </body>
+</html>

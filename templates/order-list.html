@@ -1,0 +1,128 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Customer & Order Tracking System">
+    <meta name="keywords" content="tracking, order list, order management">
+    <meta name="author" content="Tracking App">
+    <link rel="icon" href="{% static 'assets/images/favicon.png' %}" type="image/x-icon">
+    <link rel="shortcut icon" href="{% static 'assets/images/favicon.png' %}" type="image/x-icon">
+    <title>Tracking System - Order List</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="{% static 'assets/css/font-awesome.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'assets/css/vendors/icofont.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'assets/css/vendors/themify.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'assets/css/vendors/flag-icon.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'assets/css/vendors/feather-icon.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'assets/css/vendors/bootstrap.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'assets/css/style.css' %}">
+    <link id="color" rel="stylesheet" href="{% static 'assets/css/color-1.css' %}" media="screen">
+    <link rel="stylesheet" type="text/css" href="{% static 'assets/css/responsive.css' %}">
+    <style>
+      .order-status{padding:4px 10px;border-radius:16px;font-size:.8em;font-weight:600}
+      .order-status.pending{background:#fff3cd;color:#856404}
+      .order-status.in-progress{background:#d1ecf1;color:#0c5460}
+      .order-status.completed{background:#e2f5ea;color:#1e7e34}
+      .order-priority{padding:2px 8px;border-radius:12px;font-size:.75em;font-weight:600}
+      .order-priority.priority-high{background:#fff3cd;color:#856404}
+      .filter-chip{cursor:pointer;border:1px solid #e9ecef;border-radius:20px;padding:6px 12px;margin:0 6px 6px 0;display:inline-block}
+      .filter-chip.active{background:#667eea;color:#fff;border-color:#667eea}
+      .card.order-card{position:relative}
+      .card.order-card .order-status{position:absolute;top:10px;right:10px}
+    </style>
+  </head>
+  <body>
+    <div class="loader-wrapper"><div class="loader"><div class="loader4"></div></div></div>
+    <div class="tap-top"><i data-feather="chevrons-up"></i></div>
+    <div class="page-wrapper compact-wrapper" id="pageWrapper">
+      <div class="page-header">
+        <div class="header-wrapper row m-0">
+          <form class="form-inline search-full col" action="#" method="get"><div class="form-group w-100"><div class="Typeahead Typeahead--twitterUsers"><div class="u-posRelative"><input class="demo-input Typeahead-input form-control-plaintext w-100" type="text" placeholder="Search orders..." name="q" autofocus><div class="spinner-border Typeahead-spinner" role="status"><span class="sr-only">Loading...</span></div><i class="close-search" data-feather="x"></i></div><div class="Typeahead-menu"></div></div></div></form>
+          <div class="header-logo-wrapper col-auto p-0"><div class="logo-wrapper"><a href="{% url 'dashboard' %}"><img class="img-fluid for-light" src="{% static 'assets/images/logo/logo_dark.png' %}" alt=""><img class="img-fluid for-dark" src="{% static 'assets/images/logo/logo.png' %}" alt=""></a></div><div class="toggle-sidebar"><i class="status_toggle middle sidebar-toggle" data-feather="align-center"></i></div></div>
+          <div class="left-header col-xxl-5 col-xl-6 col-lg-5 col-md-4 col-sm-3 p-0"><div><a class="toggle-sidebar" href="#"><i class="iconly-Category icli"></i></a><div class="d-flex align-items-center gap-2 "><h4 class="f-w-600">Order List</h4></div></div></div>
+          <div class="nav-right col-xxl-7 col-xl-6 col-md-7 col-8 pull-right right-header p-0 ms-auto"><ul class="nav-menus"><li class="d-md-block d-none"><div class="form search-form mb-0"><div class="input-group"><span class="input-icon"><svg><use href="{% static 'assets/svg/icon-sprite.svg#search-header' %}"></use></svg><input class="w-100" type="search" placeholder="Search orders" id="headerSearch"></span></div></div></li><li><div class="mode"><i class="moon" data-feather="moon"></i></div></li></ul></div>
+        </div>
+      </div>
+      <div class="page-body-wrapper">
+        <div class="sidebar-wrapper" sidebar-layout="stroke-svg">
+          <div>
+            <div class="logo-wrapper"><a href="{% url 'dashboard' %}"><img class="img-fluid" src="{% static 'assets/images/logo/logo.png' %}" alt=""></a><div class="toggle-sidebar"><i class="status_toggle middle sidebar-toggle" data-feather="grid"></i></div></div>
+            <div class="logo-icon-wrapper"><a href="{% url 'dashboard' %}"><img class="img-fluid" src="{% static 'assets/images/logo/logo-icon.png' %}" alt=""></a></div>
+            <nav class="sidebar-main">
+              <div class="left-arrow" id="left-arrow"><i data-feather="arrow-left"></i></div>
+              <div id="sidebar-menu">
+                <ul class="sidebar-links" id="simple-bar">
+                  <li class="back-btn"><a href="{% url 'dashboard' %}"><img class="img-fluid" src="{% static 'assets/images/logo/logo-icon.png' %}" alt=""></a><div class="mobile-back text-end"><span>Back</span><i class="fa fa-angle-right ps-2" aria-hidden="true"></i></div></li>
+                  <li class="sidebar-main-title"><div><h6>Main Menu</h6></div></li>
+                  <li class="sidebar-list"><a class="sidebar-link sidebar-title link-nav" href="{% url 'dashboard' %}"><svg class="stroke-icon"><use href="{% static 'assets/svg/icon-sprite.svg#stroke-home' %}"></use></svg><span>Dashboard</span></a></li>
+                  <li class="sidebar-list"><a class="sidebar-link sidebar-title" href="#"><svg class="stroke-icon"><use href="{% static 'assets/svg/icon-sprite.svg#stroke-user' %}"></use></svg><span>Customers</span></a>
+                    <ul class="sidebar-submenu"><li><a href="{% url 'customer_register' %}">New Registration</a></li><li><a href="{% url 'customer_list' %}">View All</a></li><li><a href="{% url 'customer_search' %}">Search Customer</a></li></ul>
+                  </li>
+                  <li class="sidebar-list"><a class="sidebar-link sidebar-title active" href="#"><svg class="stroke-icon"><use href="{% static 'assets/svg/icon-sprite.svg#stroke-board' %}"></use></svg><span>Orders</span></a>
+                    <ul class="sidebar-submenu"><li><a href="{% url 'order_create' %}">Create Order</a></li><li><a class="active" href="{% url 'order_list' %}">View All Orders</a></li><li><a href="{% url 'order_tracking' %}">Track Orders</a></li></ul>
+                  </li>
+                  <li class="sidebar-list"><a class="sidebar-link sidebar-title" href="#"><svg class="stroke-icon"><use href="{% static 'assets/svg/icon-sprite.svg#stroke-charts' %}"></use></svg><span>Analytics</span></a>
+                    <ul class="sidebar-submenu"><li><a href="{% url 'analytics_overview' %}">Overview</a></li><li><a href="{% url 'analytics_performance' %}">Performance Metrics</a></li><li><a href="{% url 'analytics_customer' %}">Customer Analytics</a></li><li><a href="{% url 'analytics_service' %}">Service Analytics</a></li><li><a href="{% url 'analytics_revenue' %}">Revenue Analysis</a></li></ul>
+                  </li>
+                  <li class="sidebar-list"><a class="sidebar-link sidebar-title" href="#"><svg class="stroke-icon"><use href="{% static 'assets/svg/icon-sprite.svg#stroke-file' %}"></use></svg><span>Reports</span></a>
+                    <ul class="sidebar-submenu"><li><a href="{% url 'reports_daily' %}">Daily Reports</a></li><li><a href="{% url 'reports_customer' %}">Customer Reports</a></li><li><a href="{% url 'reports_service' %}">Service Reports</a></li><li><a href="{% url 'reports_financial' %}">Financial Reports</a></li><li><a href="{% url 'reports_custom' %}">Custom Reports</a></li></ul>
+                  </li>
+                  <li class="sidebar-main-title"><div><h6>System</h6></div></li>
+                  <li class="sidebar-list"><a class="sidebar-link sidebar-title" href="#"><svg class="stroke-icon"><use href="{% static 'assets/svg/icon-sprite.svg#stroke-setting' %}"></use></svg><span>Settings</span></a>
+                    <ul class="sidebar-submenu"><li><a href="{% url 'settings_general' %}">General Settings</a></li><li><a href="{% url 'settings_services' %}">Service Configuration</a></li><li><a href="{% url 'settings_users' %}">User Management</a></li><li><a href="{% url 'settings_backup' %}">Backup & Restore</a></li></ul>
+                  </li>
+                </ul>
+              </div>
+              <div class="right-arrow" id="right-arrow"><i data-feather="arrow-right"></i></div>
+            </nav>
+          </div>
+        </div>
+        <div class="page-body">
+          <div class="container-fluid">
+            <div class="page-title"><div class="row"><div class="col-sm-6 ps-0"><h3>Orders</h3><p class="text-muted mb-0">Browse, filter, and manage orders</p></div><div class="col-sm-6 pe-0"><ol class="breadcrumb mt-2 justify-content-end"><li class="breadcrumb-item"><a href="{% url 'dashboard' %}"><svg class="stroke-icon"><use href="{% static 'assets/svg/icon-sprite.svg#stroke-home' %}"></use></svg></a></li><li class="breadcrumb-item"><a href="#">Orders</a></li><li class="breadcrumb-item active">List</li></ol></div></div></div>
+          </div>
+          <div class="container-fluid">
+            <div class="row mb-3"><div class="col-12 d-flex flex-wrap align-items-center gap-2"><span class="filter-chip active" data-filter="all">All</span><span class="filter-chip" data-filter="today">Today</span><span class="filter-chip" data-filter="pending">Pending</span><span class="filter-chip" data-filter="in_progress">In Progress</span><span class="filter-chip" data-filter="completed">Completed</span><span class="filter-chip" data-filter="high_priority">High Priority</span><button class="btn btn-outline-primary btn-sm ms-auto" onclick="clearFilters()"><i data-feather="x" class="me-1"></i>Clear</button></div></div>
+
+            <div class="row g-3 mb-3">
+              <div class="col-xl-3 col-md-6 col-sm-12"><div class="card"><div class="card-body text-center"><small class="text-muted d-block">Total</small><h4 id="totalOrders" class="mb-0">0</h4></div></div></div>
+              <div class="col-xl-3 col-md-6 col-sm-12"><div class="card"><div class="card-body text-center"><small class="text-muted d-block">Pending</small><h4 id="pendingOrders" class="mb-0">0</h4></div></div></div>
+              <div class="col-xl-3 col-md-6 col-sm-12"><div class="card"><div class="card-body text-center"><small class="text-muted d-block">In Progress</small><h4 id="inProgressOrders" class="mb-0">0</h4></div></div></div>
+              <div class="col-xl-3 col-md-6 col-sm-12"><div class="card"><div class="card-body text-center"><small class="text-muted d-block">Completed</small><h4 id="completedOrders" class="mb-0">0</h4></div></div></div>
+            </div>
+
+            <div class="card mb-3"><div class="card-body"><div class="row g-3 align-items-end"><div class="col-md-4"><label class="form-label">Search</label><input id="orderSearch" class="form-control" type="text" placeholder="Search by order number or customer"></div><div class="col-md-4"><label class="form-label">Status</label><select id="statusFilter" class="form-select"><option value="">All</option><option value="pending">Pending</option><option value="in-progress">In Progress</option><option value="completed">Completed</option><option value="ready-for-departure">Ready for Departure</option><option value="cancelled">Cancelled</option></select></div><div class="col-md-4"><label class="form-label">Service Type</label><select id="serviceTypeFilter" class="form-select"><option value="">All</option><option value="car-service">Car Service</option><option value="tire-sales">Tire Sales</option><option value="consultation">Consultation</option></select></div></div></div></div>
+
+            <div class="d-flex justify-content-between align-items-center mb-2"><div id="orderCount" class="text-muted">Showing 0 of 0 orders</div><div class="btn-group" role="group"><button id="cardView" class="btn btn-outline-primary active" type="button">Card View</button><button id="tableView" class="btn btn-outline-secondary" type="button">Table View</button></div></div>
+
+            <div id="emptyState" class="text-center p-5" style="display:none"><i data-feather="package" style="width:48px;height:48px;"></i><p class="mt-2 mb-0">No orders found</p></div>
+
+            <div id="orderCardView"><div class="row" id="orderCardsContainer"></div></div>
+            <div id="orderTableView" style="display:none"><div class="table-responsive"><table class="table table-hover"><thead><tr><th>Order</th><th>Customer</th><th>Service</th><th>Status</th><th>Priority</th><th>Created</th><th>Actions</th></tr></thead><tbody id="orderTableBody"></tbody></table></div></div>
+          </div>
+          <footer class="footer"><div class="container-fluid"><div class="row"><div class="col-md-12 footer-copyright text-center"><p class="mb-0">Copyright 2024 © Tracking System All rights reserved.</p></div></div></div></footer>
+        </div>
+      </div>
+    </div>
+
+    <script src="{% static 'assets/js/jquery.min.js' %}"></script>
+    <script src="{% static 'assets/js/bootstrap/bootstrap.bundle.min.js' %}"></script>
+    <script src="{% static 'assets/js/icons/feather-icon/feather.min.js' %}"></script>
+    <script src="{% static 'assets/js/icons/feather-icon/feather-icon.js' %}"></script>
+    <script src="{% static 'assets/js/scrollbar/simplebar.js' %}"></script>
+    <script src="{% static 'assets/js/scrollbar/custom.js' %}"></script>
+    <script src="{% static 'assets/js/config.js' %}"></script>
+    <script src="{% static 'assets/js/sidebar-menu.js' %}"></script>
+    <script src="{% static 'assets/js/sidebar-pin.js' %}"></script>
+    <script src="{% static 'assets/js/script.js' %}"></script>
+    <script src="{% static 'tracking-system.js' %}"></script>
+    <script src="{% static 'error-handling.js' %}"></script>
+    <script src="{% static 'assets/js/order-list.js' %}"></script>
+    <script>$(function(){ if(window.feather){feather.replace();} });</script>
+  </body>
+</html>

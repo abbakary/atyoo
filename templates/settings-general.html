@@ -1,0 +1,43 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tracking System - General Settings</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" type="text/css" href="{% static 'assets/css/vendors/bootstrap.css' %}">
+  <link rel="stylesheet" type="text/css" href="{% static 'assets/css/style.css' %}">
+  <link id="color" rel="stylesheet" href="{% static 'assets/css/color-1.css' %}" media="screen">
+  <link rel="stylesheet" type="text/css" href="{% static 'assets/css/responsive.css' %}">
+</head>
+<body>
+  <div class="page-wrapper compact-wrapper" id="pageWrapper">
+    <div class="page-header"><div class="header-wrapper row m-0"><div class="left-header col"><div class="d-flex align-items-center gap-2 "><h4 class="f-w-600">General Settings</h4></div></div></div></div>
+    <div class="page-body-wrapper"><div class="page-body"><div class="container-fluid">
+      <form id="settingsForm" class="card"><div class="card-header"><h5>Organization</h5></div>
+        <div class="card-body"><div class="row g-3">
+          <div class="col-md-6"><label class="form-label">Company Name</label><input class="form-control" id="companyName" required></div>
+          <div class="col-md-6"><label class="form-label">Default Country Code</label><input class="form-control" id="phoneCode" value="+255" required></div>
+          <div class="col-12"><label class="form-label">Address</label><input class="form-control" id="companyAddress"></div>
+        </div></div>
+        <div class="card-footer d-flex justify-content-end gap-2"><button type="reset" class="btn btn-outline-secondary">Reset</button><button type="submit" class="btn btn-primary">Save</button></div>
+      </form>
+    </div></div>
+      <footer class="footer"><div class="container-fluid"><div class="row"><div class="col-md-12 footer-copyright text-center"><p class="mb-0">Copyright 2024 © Tracking System All rights reserved.</p></div></div></div></footer>
+    </div>
+  </div>
+  <script src="{% static 'assets/js/jquery.min.js' %}"></script>
+  <script src="{% static 'assets/js/bootstrap/bootstrap.bundle.min.js' %}"></script>
+  <script>
+    (function(){
+      const key='trackingSystem_settings';
+      const s = JSON.parse(localStorage.getItem(key)||'{}');
+      document.getElementById('companyName').value = s.companyName||'';
+      document.getElementById('phoneCode').value = s.phoneCode||'+255';
+      document.getElementById('companyAddress').value = s.companyAddress||'';
+      document.getElementById('settingsForm').addEventListener('submit', function(e){ e.preventDefault(); const data={companyName:document.getElementById('companyName').value, phoneCode:document.getElementById('phoneCode').value, companyAddress:document.getElementById('companyAddress').value}; localStorage.setItem(key, JSON.stringify(data)); alert('Settings saved'); });
+    })();
+  </script>
+</body>
+</html>

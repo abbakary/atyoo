@@ -1,0 +1,55 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tracking System - Custom Reports</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" type="text/css" href="{% static 'assets/css/vendors/bootstrap.css' %}">
+  <link rel="stylesheet" type="text/css" href="{% static 'assets/css/style.css' %}">
+  <link id="color" rel="stylesheet" href="{% static 'assets/css/color-1.css' %}" media="screen">
+  <link rel="stylesheet" type="text/css" href="{% static 'assets/css/responsive.css' %}">
+</head>
+<body>
+  <div class="page-wrapper compact-wrapper" id="pageWrapper">
+    <div class="page-header"><div class="header-wrapper row m-0"><div class="left-header col"><div class="d-flex align-items-center gap-2 "><h4 class="f-w-600">Custom Reports</h4></div></div></div></div>
+    <div class="page-body-wrapper"><div class="page-body"><div class="container-fluid">
+      <div class="card"><div class="card-header"><h5>Build Report</h5></div>
+        <div class="card-body">
+          <div class="row g-3 mb-3">
+            <div class="col-md-3"><label class="form-label">Status</label><select id="rStatus" class="form-select"><option value="">All</option><option>pending</option><option>in-progress</option><option>completed</option><option>cancelled</option></select></div>
+            <div class="col-md-3"><label class="form-label">Service Type</label><select id="rType" class="form-select"><option value="">All</option><option>car-service</option><option>tire-sales</option><option>consultation</option></select></div>
+            <div class="col-md-3"><label class="form-label">From</label><input type="date" id="rFrom" class="form-control"></div>
+            <div class="col-md-3"><label class="form-label">To</label><input type="date" id="rTo" class="form-control"></div>
+          </div>
+          <button class="btn btn-primary" id="runReport">Run</button>
+          <div class="table-responsive mt-3">
+            <table class="table table-striped" id="customTable"><thead><tr><th>Order #</th><th>Customer</th><th>Service</th><th>Status</th><th>Arrival</th></tr></thead><tbody></tbody></table>
+          </div>
+        </div>
+      </div>
+    </div></div>
+      <footer class="footer"><div class="container-fluid"><div class="row"><div class="col-md-12 footer-copyright text-center"><p class="mb-0">Copyright 2024 © Tracking System All rights reserved.</p></div></div></div></footer>
+    </div>
+  </div>
+  <script src="{% static 'assets/js/jquery.min.js' %}"></script>
+  <script src="{% static 'assets/js/bootstrap/bootstrap.bundle.min.js' %}"></script>
+  <script src="{% static 'tracking-system.js' %}"></script>
+  <script>
+    (function(){
+      document.getElementById('runReport').addEventListener('click', function(){
+        const status=document.getElementById('rStatus').value; const type=document.getElementById('rType').value; const from=document.getElementById('rFrom').value; const to=document.getElementById('rTo').value;
+        let list = TrackingSystem.getAllOrders();
+        if(status) list=list.filter(o=>o.status===status);
+        if(type) list=list.filter(o=>o.serviceType===type);
+        if(from) list=list.filter(o=> new Date(o.arrivalTime)>=new Date(from));
+        if(to) list=list.filter(o=> new Date(o.arrivalTime)<=new Date(to));
+        const tb=document.querySelector('#customTable tbody'); tb.innerHTML='';
+        list.forEach(o=>{const c=TrackingSystem.getCustomerById(o.customerId); const tr=document.createElement('tr'); tr.innerHTML=`<td>${o.orderNumber}</td><td>${c?c.name:o.customerName}</td><td>${o.serviceType}</td><td>${o.status}</td><td>${new Date(o.arrivalTime).toLocaleString()}</td>`; tb.appendChild(tr);});
+      });
+      document.getElementById('runReport').click();
+    })();
+  </script>
+</body>
+</html>
