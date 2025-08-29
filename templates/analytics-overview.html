@@ -85,7 +85,7 @@
   <script>
     (function(){
       if (typeof feather!== 'undefined') feather.replace();
-      const stats = TrackingSystem.getAnalytics();
+      const onReady = async () => { const stats = await TrackingSystem.getAnalytics();
       document.getElementById('kpiTotalOrders').textContent = stats.totalOrders;
       document.getElementById('kpiInProgress').textContent = stats.inProgressOrders;
       document.getElementById('kpiCompletedToday').textContent = stats.completedToday;
