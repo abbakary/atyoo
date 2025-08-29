@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Inventory - Admin</title>
+  <link rel="stylesheet" type="text/css" href="{% static 'assets/css/vendors/bootstrap.css' %}">
+  <link rel="stylesheet" type="text/css" href="{% static 'assets/css/style.css' %}">
+  <link id="color" rel="stylesheet" href="{% static 'assets/css/color-1.css' %}" media="screen">
+  <link rel="stylesheet" type="text/css" href="{% static 'assets/css/responsive.css' %}">
+</head>
+<body>
+  <div class="page-wrapper compact-wrapper" id="pageWrapper">
+    <div class="page-header">
+      <div class="header-wrapper row m-0">
+        <div class="header-logo-wrapper col-auto p-0"><div class="logo-wrapper"><a href="{% url 'admin_dashboard' %}"><img class="img-fluid" src="{% static 'assets/images/logo/logo.png' %}" alt=""></a></div></div>
+        <div class="left-header col"><h4 class="f-w-600">Inventory Management</h4></div>
+      </div>
+    </div>
+    <div class="page-body-wrapper">
+      <div class="page-body">
+        <div class="container-fluid">
+          <div class="card mb-3"><div class="card-header"><h5>Add / Update Item</h5></div>
+            <div class="card-body">
+              <form id="invForm" class="row g-3">
+                <div class="col-sm-3"><label class="form-label">SKU</label><input class="form-control" name="sku" required></div>
+                <div class="col-sm-3"><label class="form-label">Name</label><input class="form-control" name="name" required></div>
+                <div class="col-sm-2"><label class="form-label">Type</label><select class="form-select" name="type"><option value="tire">Tire</option><option value="service">Service</option></select></div>
+                <div class="col-sm-2"><label class="form-label">Brand</label><input class="form-control" name="brand"></div>
+                <div class="col-sm-2"><label class="form-label">Quantity</label><input class="form-control" type="number" min="0" name="qty" value="0"></div>
+                <div class="col-12"><label class="form-label">Unit Price</label><input class="form-control" type="number" min="0" step="0.01" name="price" value="0"></div>
+                <div class="col-12"><button class="btn btn-primary" type="submit">Save Item</button></div>
+              </form>
+            </div>
+          </div>
+          <div class="card"><div class="card-header d-flex justify-content-between align-items-center"><h5 class="mb-0">Inventory</h5><button class="btn btn-outline-danger btn-sm" id="clearInv">Clear All</button></div>
+            <div class="card-body table-responsive">
+              <table class="table" id="invTable"><thead><tr><th>SKU</th><th>Name</th><th>Type</th><th>Brand</th><th>Qty</th><th>Price</th><th>Total</th><th></th></tr></thead><tbody></tbody></table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    const KEY='ts_inventory_items';
+    const read=()=>JSON.parse(localStorage.getItem(KEY)||'[]');
+    const write=(d)=>localStorage.setItem(KEY,JSON.stringify(d));
+    function render(){const tb=document.querySelector('#invTable tbody');tb.innerHTML='';
+      read().forEach(it=>{const tr=document.createElement('tr');
+        tr.innerHTML=`<td>${it.sku}</td><td>${it.name}</td><td>${it.type}</td><td>${it.brand||''}</td><td>${it.qty}</td><td>${Number(it.price).toFixed(2)}</td><td>${(Number(it.price)*Number(it.qty)).toFixed(2)}</td><td><button class='btn btn-sm btn-outline-primary' data-edit='${it.sku}'>Edit</button> <button class='btn btn-sm btn-outline-danger' data-del='${it.sku}'>Delete</button></td>`;tb.appendChild(tr)});
+      document.getElementById('kInventory')&& (document.getElementById('kInventory').textContent=read().length);
+    }
+    document.getElementById('invForm').addEventListener('submit',e=>{e.preventDefault();const fd=new FormData(e.target);const it=Object.fromEntries(fd.entries());it.qty=Number(it.qty||0);it.price=Number(it.price||0);let data=read();const idx=data.findIndex(x=>x.sku===it.sku); if(idx>-1){data[idx]=it;} else {data.push(it);} write(data); render(); e.target.reset()});
+    document.getElementById('invTable').addEventListener('click',e=>{const sku=e.target.dataset.edit||e.target.dataset.del; if(!sku)return; let data=read(); const idx=data.findIndex(x=>x.sku===sku); if(idx<0)return; if(e.target.dataset.edit){const it=data[idx]; for(const [k,v] of Object.entries(it)){const el=document.querySelector(`#invForm [name='${k}']`); if(el) el.value=v;} window.scrollTo({top:0,behavior:'smooth'})} else {data.splice(idx,1); write(data); render();}});
+    document.getElementById('clearInv').addEventListener('click',()=>{if(confirm('Clear all inventory?')){localStorage.removeItem(KEY); render();}});
+    render();
+  </script>
+</body>
+</html>
