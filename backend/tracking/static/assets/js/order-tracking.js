@@ -476,33 +476,29 @@
     };
 
     // Update order status
-    function updateOrderStatus() {
+    async function updateOrderStatus() {
         const orderId = $('#updateOrderId').val();
         const newStatus = $('#newStatus').val();
         const notes = $('#statusNotes').val();
-        
+
         if (!newStatus) {
             showToast('Please select a status', 'error');
             return;
         }
-        
+
         try {
-            const result = TrackingSystem.updateOrderStatus(orderId, newStatus, notes);
-            
-            if (result.success) {
+            const result = await TrackingSystem.updateOrderStatus(orderId, newStatus, notes);
+            if (result && result.success) {
                 $('#statusUpdateModal').modal('hide');
                 showToast('Order status updated successfully', 'success');
-                
-                // Refresh orders and statistics
+                await TrackingSystem.syncOrders();
                 loadOrders();
                 updateStatistics();
-                
-                // Close order details modal if open
                 if (currentOrder && currentOrder.id === orderId) {
                     $('#orderDetailsModal').modal('hide');
                 }
             } else {
-                showToast('Error updating order status: ' + result.error, 'error');
+                showToast('Error updating order status' + (result && result.error ? (': ' + result.error) : ''), 'error');
             }
         } catch (error) {
             console.error('Error updating order status:', error);

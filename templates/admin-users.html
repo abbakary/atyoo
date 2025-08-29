@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>User Management - Admin</title>
+  <link rel="stylesheet" type="text/css" href="{% static 'assets/css/vendors/bootstrap.css' %}">
+  <link rel="stylesheet" type="text/css" href="{% static 'assets/css/style.css' %}">
+  <link id="color" rel="stylesheet" href="{% static 'assets/css/color-1.css' %}" media="screen">
+  <link rel="stylesheet" type="text/css" href="{% static 'assets/css/responsive.css' %}">
+</head>
+<body>
+  <div class="page-wrapper compact-wrapper" id="pageWrapper">
+    <div class="page-header">
+      <div class="header-wrapper row m-0">
+        <div class="header-logo-wrapper col-auto p-0"><div class="logo-wrapper"><a href="{% url 'admin_dashboard' %}"><img class="img-fluid" src="{% static 'assets/images/logo/logo.png' %}" alt=""></a></div></div>
+        <div class="left-header col"><h4 class="f-w-600">User Management</h4></div>
+      </div>
+    </div>
+    <div class="page-body-wrapper">
+      <div class="page-body">
+        <div class="container-fluid">
+          <div class="card">
+            <div class="card-header"><h5>Users</h5></div>
+            <div class="card-body table-responsive">
+              <table class="table">
+                <thead><tr><th>Username</th><th>Email</th><th>Staff</th><th>Superuser</th><th>Active</th></tr></thead>
+                <tbody>
+                  {% for u in request.user.__class__.objects.all %}
+                  <tr><td>{{ u.username }}</td><td>{{ u.email }}</td><td>{{ u.is_staff }}</td><td>{{ u.is_superuser }}</td><td>{{ u.is_active }}</td></tr>
+                  {% empty %}
+                  <tr><td colspan="5" class="text-center">No users</td></tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+              <a class="btn btn-outline-primary" href="/admin/auth/user/" target="_blank">Open Django Admin</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="{% static 'assets/js/icons/feather-icon/feather.min.js' %}"></script>
+  <script>if(window.feather){feather.replace();}</script>
+</body>
+</html>

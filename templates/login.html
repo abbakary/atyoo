@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - Tracking System</title>
+  <link rel="icon" href="{% static 'assets/images/favicon.png' %}" type="image/x-icon">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" type="text/css" href="{% static 'assets/css/vendors/bootstrap.css' %}">
+  <link rel="stylesheet" type="text/css" href="{% static 'assets/css/style.css' %}">
+  <link id="color" rel="stylesheet" href="{% static 'assets/css/color-1.css' %}" media="screen">
+  <link rel="stylesheet" type="text/css" href="{% static 'assets/css/responsive.css' %}">
+  <style>
+    .login-wrapper{min-height:100vh;display:flex}
+    .login-left{flex:1;background:#000;color:#fff;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+    .login-copy{max-width:520px;padding:40px}
+    .brand-title{font-weight:700;font-size:40px;color:#ffd54f}
+    .brand-sub{opacity:.9}
+    .login-right{flex:1;background:linear-gradient(180deg,#ffcc67 0%, #ffb84d 100%);display:flex;align-items:center;justify-content:center;position:relative}
+    .login-card{background:#fff;border-radius:16px;box-shadow:0 10px 30px rgba(0,0,0,.15);padding:28px;width:100%;max-width:420px}
+    .tyre{position:absolute;left:-300px;bottom:10%;width:220px;filter:drop-shadow(0 12px 20px rgba(0,0,0,.35));opacity:.95}
+    .tyre.run{animation:roll 1.4s ease-out forwards}
+    @keyframes roll{0%{left:-300px;transform:rotate(0)}100%{left:calc(100% - 240px);transform:rotate(720deg)}}
+    .login-hero{position:absolute;inset:0;background:url('https://cdn.builder.io/api/v1/image/assets%2F4056b08a92504e73a3be0aaea03303bc%2F03d4b09a5552494bb27474fbec69d173?format=webp&width=1200') center/cover no-repeat;opacity:.15}
+  </style>
+</head>
+<body>
+  <div class="login-wrapper">
+    <div class="login-left">
+      <div class="login-hero"></div>
+      <div class="login-copy text-center">
+        <h2 class="mb-2 text-light">Welcome to</h2>
+        <div class="brand-title mb-2">Superdoll</div>
+        <p class="brand-sub">Professional car service tracking and management system</p>
+      </div>
+    </div>
+    <div class="login-right">
+      <img src="https://cdn.builder.io/api/v1/image/assets%2F4056b08a92504e73a3be0aaea03303bc%2F6d30c7cac9124255a287b9247583dd55?format=webp&width=600" class="tyre" id="loginTyre" alt="Tyre">
+      <div class="login-card">
+        <div class="text-center mb-3">
+          <div class="rounded-circle bg-warning mx-auto mb-2" style="width:42px;height:42px"></div>
+          <h4 class="mb-0">Superdoll</h4>
+          <small class="text-muted">Car Service Management System</small>
+        </div>
+        {% if error %}<div class="alert alert-danger py-2">{{ error }}</div>{% endif %}
+        <form method="post">
+          {% csrf_token %}
+          <div class="mb-3">
+            <label class="form-label">User Type</label>
+            <select class="form-select" name="user_type" required>
+              <option>Administrator</option>
+              <option selected>Manager</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Username</label>
+            <input class="form-control" type="text" name="username" placeholder="Enter your username" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Password</label>
+            <div class="input-group">
+              <input class="form-control" id="pwd" type="password" name="password" placeholder="Enter your password" required>
+              <button class="btn btn-outline-secondary" type="button" id="togglePwd"><i data-feather="eye"></i></button>
+            </div>
+          </div>
+          <button class="btn btn-warning w-100" type="submit">Sign In</button>
+        </form>
+      </div>
+    </div>
+  </div>
+  <script src="{% static 'assets/js/icons/feather-icon/feather.min.js' %}"></script>
+  <script>if(window.feather){feather.replace();}
+    const tyre=document.getElementById('loginTyre');
+    window.addEventListener('load',()=>{setTimeout(()=>tyre.classList.add('run'),300)});
+    document.getElementById('togglePwd').addEventListener('click',()=>{const p=document.getElementById('pwd');p.type=p.type==='password'?'text':'password'});
+  </script>
+</body>
+</html>

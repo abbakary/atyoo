@@ -1,4 +1,4 @@
-/**
+/*
  * Tracking System Core JavaScript
  * Main application functionality and utilities
  */
@@ -7,243 +7,116 @@ var TrackingSystem = (function() {
     'use strict';
 
     // Application configuration
-    const config = {
-        version: '1.0.0',
-        debug: true
+    const config = { version: '1.0.1', debug: true };
+
+    // Internal caches backed by localStorage so synchronous reads are possible for UI scripts
+    const STORAGE = {
+        customers: 'trackingSystem_customers',
+        orders: 'trackingSystem_orders'
     };
+
+    function read(key, fallback){
+        try { return JSON.parse(localStorage.getItem(key) || fallback); } catch { return JSON.parse(fallback); }
+    }
+    function write(key, data){ try { localStorage.setItem(key, JSON.stringify(data)); } catch(_) {}
+    }
 
     // Utility functions
     const utils = {
-        log: function(message) {
-            if (config.debug) {
-                console.log('[TrackingSystem] ' + message);
-            }
-        },
-        
-        formatDate: function(date) {
-            return new Date(date).toLocaleString();
-        },
-        
-        formatDuration: function(minutes) {
-            const hours = Math.floor(minutes / 60);
-            const mins = minutes % 60;
-            return hours > 0 ? `${hours}h ${mins}m` : `${mins}m`;
-        }
+        log(msg){ if (config.debug) console.log('[TrackingSystem] ' + msg); },
+        formatDate(date){ return new Date(date).toLocaleString(); },
+        formatDuration(minutes){ const h=Math.floor(minutes/60), m=minutes%60; return h>0? `${h}h ${m}m`:`${m}m`; }
     };
 
-    // Customer management
-    const customers = {
-        getAll: function() {
-            return JSON.parse(localStorage.getItem('trackingSystem_customers') || '[]');
-        },
-        
-        save: function(customer) {
-            const customers = this.getAll();
-            customers.push(customer);
-            localStorage.setItem('trackingSystem_customers', JSON.stringify(customers));
-        },
-        
-        findByPhone: function(phone) {
-            return this.getAll().find(c => c.phone === phone);
-        }
-    };
+    // Customers (minimal cache helpers for list pages)
+    function cacheCustomers(list){ if(Array.isArray(list)) write(STORAGE.customers, list); }
+    function getCustomerByIdSync(id){ return read(STORAGE.customers,'[]').find(c=>c.id===id) || null; }
 
-    // Order management
-    const orders = {
-        getAll: function() {
-            return JSON.parse(localStorage.getItem('trackingSystem_orders') || '[]');
-        },
-        
-        save: function(order) {
-            const orders = this.getAll();
-            orders.push(order);
-            localStorage.setItem('trackingSystem_orders', JSON.stringify(orders));
-        },
-        
-        update: function(orderId, updates) {
-            const orders = this.getAll();
-            const index = orders.findIndex(o => o.id === orderId);
-            if (index !== -1) {
-                orders[index] = { ...orders[index], ...updates };
-                localStorage.setItem('trackingSystem_orders', JSON.stringify(orders));
-            }
-        },
-        
-        getByStatus: function(status) {
-            return this.getAll().filter(o => o.status === status);
-        }
-    };
-
-    // Initialize the application
-    function init() {
-        utils.log('Tracking System initialized');
-        // No mock/localStorage seeding. Data comes from backend APIs only.
+    // Orders cache helpers used by list/tracking pages
+    function cacheOrders(list){ if(Array.isArray(list)) write(STORAGE.orders, normalizeOrders(list)); }
+    function normalizeOrders(list){
+        return list.map(o=>({
+            id: o.id,
+            orderNumber: o.orderNumber,
+            customerId: o.customerId,
+            serviceType: o.serviceType,
+            orderType: o.orderType,
+            status: o.status,
+            priority: o.priority || 'normal',
+            arrivalTime: o.arrivalTime,
+            createdAt: o.createdAt,
+            departureTime: o.departureTime || null,
+            notes: o.description || ''
+        }));
     }
 
-    // API endpoints
-    const api = {
-        createCustomer: function(customerData) {
-            return fetch('/api/customers/', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': getCsrfToken()
-                },
-                body: JSON.stringify(customerData)
-            })
-            .then(response => response.json())
-            .catch(error => {
-                console.error('API Error:', error);
-                return { success: false, error: 'Network error occurred' };
-            });
-        },
-        
-        searchCustomers: function(query) {
-            return fetch(`/api/customers/search/?q=${encodeURIComponent(query)}`)
-                .then(response => response.json())
-                .catch(error => {
-                    console.error('API Error:', error);
-                    return { success: false, error: 'Network error occurred' };
-                });
-        },
-        
-        createOrder: function(orderData) {
-            return fetch('/api/orders/', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': getCsrfToken()
-                },
-                body: JSON.stringify(orderData)
-            })
-            .then(response => response.json())
-            .catch(error => {
-                console.error('API Error:', error);
-                return { success: false, error: 'Network error occurred' };
-            });
-        }
-    };
+    // Public synchronous getters (use local cache). Pages can call sync* to refresh
+    function getAllOrders(){ return read(STORAGE.orders,'[]'); }
+    function getOrderById(id){ return getAllOrders().find(o=>o.id===id) || null; }
 
-    // Get CSRF token for Django
-    function getCsrfToken() {
-        const cookies = document.cookie.split(';');
-        for (let cookie of cookies) {
-            const [name, value] = cookie.trim().split('=');
-            if (name === 'csrftoken') {
-                return value;
-            }
-        }
-        // Fallback: try to get from meta tag
-        const meta = document.querySelector('meta[name="csrf-token"]');
+    // Network API
+    function getCsrfToken(){
+        const cookies=(document.cookie||'').split(';');
+        for (let cookie of cookies){ const [n,v]=cookie.trim().split('='); if(n==='csrftoken') return v; }
+        const meta=document.querySelector('meta[name="csrf-token"]');
         return meta ? meta.getAttribute('content') : '';
     }
 
-    // Enhanced customer creation with backend integration
-    function createCustomer(customerData) {
-        utils.log('Creating customer: ' + customerData.name);
-        
-        // Validate required fields
-        if (!customerData.name || !customerData.phone) {
-            return Promise.resolve({ 
-                success: false, 
-                error: 'Name and phone number are required' 
-            });
-        }
-
-        // Call the backend API
-        return api.createCustomer(customerData)
-            .then(result => {
-                if (result.success) {
-                    // Also store in localStorage for immediate frontend use
-                    // Do not store to localStorage; rely on backend as source of truth
-                    utils.log('Customer created successfully: ' + result.customer.id);
+    const api = {
+        createCustomer(customerData){
+            return fetch('/api/customers/', { method:'POST', headers:{ 'Content-Type':'application/json','X-CSRFToken':getCsrfToken() }, body:JSON.stringify(customerData) })
+                .then(r=>r.json())
+                .then(res=>{ if(res && res.success && res.customer){
+                    // Merge minimal cache for quick lookups
+                    const all = read(STORAGE.customers,'[]');
+                    if(!all.find(c=>c.id===res.customer.id)) { all.unshift(res.customer); write(STORAGE.customers, all.slice(0,500)); }
                 }
-                return result;
-            });
-    }
-
-    // Enhanced order creation with backend integration
-    function createOrder(orderData) {
-        utils.log('Creating order for customer: ' + orderData.customerId);
-        
-        // Validate required fields
-        if (!orderData.customerId || !orderData.serviceType) {
-            return Promise.resolve({ 
-                success: false, 
-                error: 'Customer ID and service type are required' 
-            });
+                return res; });
+        },
+        searchCustomers(query){ return fetch(`/api/customers/search/?q=${encodeURIComponent(query)}`).then(r=>r.json()).then(res=>{ if(res && res.success){ cacheCustomers(res.results||[]); } return res; }); },
+        createOrder(orderData){
+            return fetch('/api/orders/', { method:'POST', headers:{ 'Content-Type':'application/json','X-CSRFToken':getCsrfToken() }, body:JSON.stringify(orderData) })
+                .then(r=>r.json())
+                .then(res=>{ if(res && res.success && res.order){
+                    const all = getAllOrders(); all.unshift(normalizeOrders([res.order])[0]); write(STORAGE.orders, all.slice(0,500)); }
+                    return res; });
+        },
+        listOrders(){ return fetch('/api/orders/list/').then(r=>r.json()).then(res=>{ if(res && res.success){ cacheOrders(res.results||[]); } return res; }); },
+        updateOrderStatus(orderId, status){
+            return fetch(`/api/orders/${encodeURIComponent(orderId)}/status/`, { method:'POST', headers:{ 'Content-Type':'application/json','X-CSRFToken':getCsrfToken() }, body:JSON.stringify({status}) })
+                .then(r=>r.json())
+                .then(res=>{ if(res && res.success && res.order){
+                    const all=getAllOrders(); const idx=all.findIndex(o=>o.id===orderId); const updated=normalizeOrders([res.order])[0]; if(idx>-1){ all[idx]=updated; } else { all.unshift(updated);} write(STORAGE.orders, all); }
+                    return res; });
         }
+    };
 
-        // Call the backend API
-        return api.createOrder(orderData)
-            .then(result => {
-                if (result.success) {
-                    utils.log('Order created successfully: ' + result.order.orderNumber);
-                }
-                return result;
-            });
-    }
+    // Convenience async helpers for pages
+    async function syncOrders(){ const res = await api.listOrders(); return res.success ? getAllOrders() : []; }
+    async function syncCustomers(q){ const res = await api.searchCustomers(q||''); return res.success ? read(STORAGE.customers,'[]') : []; }
 
-    function getCustomerById(id){
-        return fetch(`/api/customers/${encodeURIComponent(id)}/`)
-            .then(r=>r.json())
-            .then(res=>res.success ? res.customer : null)
-            .catch(()=>null);
-    }
-
-    function searchCustomers(q){
-        return api.searchCustomers(q);
-    }
-
-    async function getAnalytics(){
-        try{
-            const [summaryRes, ordersRes] = await Promise.all([
-                fetch('/api/analytics/summary/').then(r=>r.json()),
-                fetch('/api/orders/list/').then(r=>r.json())
-            ]);
-            const now = new Date();
-            const last7 = [...Array(7)].map((_,i)=>{const d=new Date(now); d.setDate(now.getDate()- (6-i)); return d;});
-            const orders = (ordersRes.success? ordersRes.results: []) || [];
-            const dailyStats = last7.map(d=>{
-                const dateStr = d.toDateString();
-                const count = orders.filter(o=> new Date(o.arrivalTime||o.createdAt).toDateString()===dateStr).length;
-                return { date: d.toISOString(), orders: count };
-            });
-            const serviceTypeStats = {};
-            const breakdown = (summaryRes.success && summaryRes.data && summaryRes.data.serviceBreakdown) ? summaryRes.data.serviceBreakdown : [];
-            breakdown.forEach(b=>{ serviceTypeStats[b.service_type] = b.count; });
-            return {
-                totalOrders: orders.length,
-                inProgressOrders: (orders.filter(o=> o.status==='in-progress').length),
-                completedToday: (orders.filter(o=> (o.status==='completed') && (o.departureTime||'').slice(0,10)===now.toISOString().slice(0,10)).length),
-                totalCustomers: summaryRes.success && summaryRes.data ? (summaryRes.data.totalCustomers||0):0,
-                serviceTypeStats,
-                dailyStats
-            };
-        }catch(e){
-            return { totalOrders:0,inProgressOrders:0,completedToday:0,totalCustomers:0,serviceTypeStats:{},dailyStats:[] };
-        }
-    }
-
-    // Public API
+    // Backwards-compat public API
     return {
-        init: init,
-        config: config,
-        utils: utils,
-        customers: customers,
-        orders: orders,
-        createCustomer: createCustomer,
-        createOrder: createOrder,
-        api: api,
-        getCustomerById: getCustomerById,
-        getAnalytics: getAnalytics,
-        searchCustomers: searchCustomers
+        init(){ utils.log('Tracking System initialized'); },
+        utils,
+        getAnalytics: async function(){
+            try{ const [summary, list] = await Promise.all([ fetch('/api/analytics/summary/').then(r=>r.json()), api.listOrders() ]);
+                const now=new Date(); const last7=[...Array(7)].map((_,i)=>{const d=new Date(now); d.setDate(now.getDate()-(6-i)); return d;});
+                const orders=getAllOrders(); const dailyStats=last7.map(d=>({ date:d.toISOString(), orders: orders.filter(o=> new Date(o.arrivalTime||o.createdAt).toDateString()===d.toDateString()).length }));
+                const serviceTypeStats={}; const breakdown=(summary.success && summary.data && summary.data.serviceBreakdown)? summary.data.serviceBreakdown:[]; breakdown.forEach(b=>{serviceTypeStats[b.service_type]=b.count;});
+                return { totalOrders:orders.length, inProgressOrders: orders.filter(o=>o.status==='in-progress').length, completedToday: orders.filter(o=> (o.status==='completed') && (o.departureTime||'').slice(0,10)===now.toISOString().slice(0,10)).length, totalCustomers: summary.success && summary.data ? (summary.data.totalCustomers||0):0, serviceTypeStats, dailyStats };
+            }catch(e){ return { totalOrders:0,inProgressOrders:0,completedToday:0,totalCustomers:0,serviceTypeStats:{},dailyStats:[] }; }
+        },
+        // Customers
+        getCustomerById(id){ return fetch(`/api/customers/${encodeURIComponent(id)}/`).then(r=>r.json()).then(res=>res.success? res.customer : null).catch(()=>getCustomerByIdSync(id)); },
+        searchCustomers: api.searchCustomers,
+        createCustomer: api.createCustomer,
+        // Orders
+        createOrder: api.createOrder,
+        getAllOrders,
+        getOrderById,
+        updateOrderStatus: function(orderId, status){ return api.updateOrderStatus(orderId, status); },
+        syncOrders,
+        syncCustomers
     };
 })();
-
-// Auto-initialize if DOM is ready
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', TrackingSystem.init);
-} else {
-    TrackingSystem.init();
-}
